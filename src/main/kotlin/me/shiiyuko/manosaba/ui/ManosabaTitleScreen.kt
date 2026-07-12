@@ -25,10 +25,11 @@ import me.shiiyuko.manosaba.utils.SpriteAtlas
 import me.shiiyuko.manosaba.utils.UnitySpriteParser
 import net.minecraft.SharedConstants
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.screens.multiplayer.MultiplayerScreen
+import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen
+import net.minecraft.client.gui.screens.Screen
 import net.minecraft.client.gui.screens.options.OptionsScreen
-import net.minecraft.client.gui.screens.world.CreateWorldScreen
-import net.minecraft.client.gui.screens.world.SelectWorldScreen
+import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen
+import net.minecraft.client.gui.screens.worldselection.SelectWorldScreen
 import net.minecraft.client.resources.sounds.SimpleSoundInstance
 import net.minecraft.network.chat.Component
 import org.jetbrains.skia.FilterTileMode
@@ -65,17 +66,17 @@ class ManosabaTitleScreen : ComposeScreen(Component.literal("Manosaba Title Scre
         )
     }
 
-    override fun close() {
-        super.close()
+    override fun removed() {
+        super.removed()
     }
 
     private fun playMusic() {
         val client = Minecraft.getInstance()
 
-        client.soundManager.stopAll()
-        client.musicTracker.stop()
+        client.soundManager.stop()
+        client.musicManager.stopPlaying()
 
-        val sound = SimpleSoundInstance.forMusic(Manosaba.TITLE_MUSIC.get())
+        val sound = SimpleSoundInstance.forMusic(Manosaba.getTitleMusic())
         client.soundManager.play(sound)
     }
 
@@ -178,12 +179,18 @@ class ManosabaTitleScreen : ComposeScreen(Component.literal("Manosaba Title Scre
             }
 
             sprites?.let { spriteMap ->
+                val showLoad: () -> Unit = { client.setScreen(SelectWorldScreen(this@ManosabaTitleScreen)) }
+                val showNewGame: () -> Unit = { CreateWorldScreen.openFresh(client, this@ManosabaTitleScreen) }
+                val showGallery: () -> Unit = { client.setScreen(JoinMultiplayerScreen(this@ManosabaTitleScreen)) }
+                val showOptions: () -> Unit = { client.setScreen(OptionsScreen(this@ManosabaTitleScreen, client.options)) }
+                val showExit: () -> Unit = { showExitDialog = true }
+
                 val buttons = listOf(
-                    ButtonConfig("LoadGame", 20) { client.setScreen(SelectWorldScreen(this@ManosabaTitleScreen)) },
-                    ButtonConfig("NewGame", -20) { CreateWorldScreen.show(client, this@ManosabaTitleScreen) },
-                    ButtonConfig("Gallery", 20) { client.setScreen(MultiplayerScreen(this@ManosabaTitleScreen)) },
-                    ButtonConfig("Options", -20) { client.setScreen(OptionsScreen(this@ManosabaTitleScreen, client.options)) },
-                    ButtonConfig("Exit", 20) { showExitDialog = true }
+                    ButtonConfig("LoadGame", 20, onClick = showLoad),
+                    ButtonConfig("NewGame", -20, onClick = showNewGame),
+                    ButtonConfig("Gallery", 20, onClick = showGallery),
+                    ButtonConfig("Options", -20, onClick = showOptions),
+                    ButtonConfig("Exit", 20, onClick = showExit)
                 )
 
                 Row(

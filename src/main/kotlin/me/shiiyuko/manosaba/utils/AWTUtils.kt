@@ -4,7 +4,7 @@ import androidx.compose.ui.InternalComposeUiApi
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.key.KeyEventType
-import net.minecraft.client.MinecraftClient
+import net.minecraft.client.Minecraft
 import org.lwjgl.glfw.GLFW
 import java.awt.Component
 import java.awt.event.InputEvent
@@ -162,7 +162,7 @@ internal object AWTUtils {
 
     @OptIn(InternalComposeUiApi::class)
     fun createKeyEvent(awtId: Int, time: Long, awtMods: Int, key: Int, char: Char, location: Int): KeyEvent {
-        val handle = MinecraftClient.getInstance().window.handle
+        val handle = Minecraft.getInstance().window.window
         return KeyEvent(
             key = Key(key, location),
             type = when (awtId) {

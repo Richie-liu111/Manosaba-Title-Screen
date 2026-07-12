@@ -22,7 +22,9 @@ import me.shiiyuko.manosaba.utils.GlStateUtils
 import me.shiiyuko.manosaba.utils.UnitySpriteParser
 import net.minecraft.client.Minecraft
 import org.jetbrains.skia.*
+import org.lwjgl.glfw.GLFW
 import org.lwjgl.opengl.GL33C
+import java.nio.IntBuffer
 import kotlin.math.max
 
 @OptIn(InternalComposeUiApi::class)
@@ -45,6 +47,13 @@ object SplashOverlayRenderer {
     private var logoAlpha = mutableStateOf(1f)
 
     private val window get() = mc.window
+
+    private fun getFramebufferSize(): Pair<Int, Int> {
+        val w = IntBuffer.allocate(1)
+        val h = IntBuffer.allocate(1)
+        GLFW.glfwGetFramebufferSize(window.window, w, h)
+        return w.get(0) to h.get(0)
+    }
 
     private fun loadResources() {
         if (resourcesLoaded) return
@@ -89,15 +98,15 @@ object SplashOverlayRenderer {
     }
 
     private fun buildSkiaSurface() {
-        val (frameWidth, frameHeight) = window.framebufferWidth to window.framebufferHeight
+        val (fbW, fbH) = getFramebufferSize()
 
-        surface?.takeIf { it.width == frameWidth && it.height == frameHeight }?.let { return }
+        surface?.takeIf { it.width == fbW && it.height == fbH }?.let { return }
 
         closeSkiaResources()
 
         skiaContext = DirectContext.makeGL()
         renderTarget = BackendRenderTarget.makeGL(
-            frameWidth, frameHeight, 0, 8,
+            fbW, fbH, 0, 8,
             mc.mainRenderTarget.frameBufferId, FramebufferFormat.GR_GL_RGBA8
         )
         surface = Surface.makeFromBackendRenderTarget(
@@ -162,8 +171,9 @@ object SplashOverlayRenderer {
 
         buildSkiaSurface()
 
-        val fbWidth = window.framebufferWidth.toFloat()
-        val fbHeight = window.framebufferHeight.toFloat()
+        val (fbW, fbH) = getFramebufferSize()
+        val fbWidth = fbW.toFloat()
+        val fbHeight = fbH.toFloat()
         val scaleX = fbWidth / DESIGN_WIDTH
         val scaleY = fbHeight / DESIGN_HEIGHT
         val renderScale = max(scaleX, scaleY)

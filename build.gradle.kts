@@ -1,5 +1,5 @@
 plugins {
-    id("net.neoforged.gradle.userdev") version "7.0.171"
+    id("net.neoforged.gradle.userdev") version "7.1.36"
     kotlin("jvm") version "2.1.0"
     id("org.jetbrains.kotlin.plugin.compose") version "2.1.0"
     id("org.jetbrains.compose") version "1.7.3"
@@ -19,21 +19,19 @@ java {
 }
 
 repositories {
+    maven("https://maven.aliyun.com/repository/public")
     mavenCentral()
     google()
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
 }
 
 minecraft {
-    mappings {
-        channel.set("official")
-        version.set("1.21.1")
-    }
-
     runs {
         configureEach {
             systemProperty("forge.logging.markers", "REGISTRIES")
             systemProperty("forge.logging.console.level", "debug")
+            systemProperty("mixin.env.remapRefMap", "true")
+            systemProperty("mixin.env.refMapRemappingFile", "${projectDir}/build/createSrgToMcp/output.srg")
         }
 
         create("client") {
@@ -83,18 +81,22 @@ tasks.withType<JavaCompile>().configureEach {
     options.release.set(21)
 }
 
+
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
     compilerOptions {
         jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)
     }
 }
 
+val minecraftVersion = property("minecraft_version") as String
+val neoVersion = property("neo_version") as String
+
 tasks.processResources {
     filesMatching("META-INF/mods.toml") {
         expand(
             "version" to project.version,
-            "minecraft_version" to property("minecraft_version"),
-            "neo_version" to property("neo_version")
+            "minecraft_version" to minecraftVersion,
+            "neo_version" to neoVersion
         )
     }
 }

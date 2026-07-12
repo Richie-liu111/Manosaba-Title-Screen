@@ -28,6 +28,7 @@ import org.jetbrains.skia.SurfaceColorFormat
 import org.jetbrains.skia.SurfaceOrigin
 import org.lwjgl.glfw.GLFW
 import org.lwjgl.opengl.GL33C
+import java.nio.IntBuffer
 import java.awt.event.KeyEvent
 import java.awt.event.MouseEvent
 import kotlin.math.max
@@ -48,7 +49,7 @@ abstract class ComposeScreen(title: Component) : Screen(title) {
 
     private val window get() = mc.window
     private val currentTime get() = System.currentTimeMillis()
-    private val awtMods get() = AWTUtils.getAwtMods(window.handle)
+    private val awtMods get() = AWTUtils.getAwtMods(window.window)
 
     private var renderScale = 1f
     private var renderOffsetX = 0f
@@ -74,8 +75,15 @@ abstract class ComposeScreen(title: Component) : Screen(title) {
         }
     }
 
+    private fun getFramebufferSize(): Pair<Int, Int> {
+        val w = IntBuffer.allocate(1)
+        val h = IntBuffer.allocate(1)
+        GLFW.glfwGetFramebufferSize(window.window, w, h)
+        return w.get(0) to h.get(0)
+    }
+
     private fun buildSkiaSurface() {
-        val (frameWidth, frameHeight) = window.framebufferWidth to window.framebufferHeight
+        val (frameWidth, frameHeight) = getFramebufferSize()
 
         surface?.takeIf { it.width == frameWidth && it.height == frameHeight }?.let { return }
 
@@ -93,15 +101,16 @@ abstract class ComposeScreen(title: Component) : Screen(title) {
     }
 
     private fun calculateScaleParams() {
-        val fbWidth = window.framebufferWidth.toFloat()
-        val fbHeight = window.framebufferHeight.toFloat()
+        val (fbWidth, fbHeight) = getFramebufferSize()
+        val fw = fbWidth.toFloat()
+        val fh = fbHeight.toFloat()
 
-        val scaleX = fbWidth / DESIGN_WIDTH
-        val scaleY = fbHeight / DESIGN_HEIGHT
+        val scaleX = fw / DESIGN_WIDTH
+        val scaleY = fh / DESIGN_HEIGHT
 
         renderScale = max(scaleX, scaleY)
-        renderOffsetX = (fbWidth - DESIGN_WIDTH * renderScale) / 2f
-        renderOffsetY = (fbHeight - DESIGN_HEIGHT * renderScale) / 2f
+        renderOffsetX = (fw - DESIGN_WIDTH * renderScale) / 2f
+        renderOffsetY = (fh - DESIGN_HEIGHT * renderScale) / 2f
     }
 
     override fun render(context: GuiGraphics, mouseX: Int, mouseY: Int, delta: Float) {
@@ -141,9 +150,9 @@ abstract class ComposeScreen(title: Component) : Screen(title) {
     }
 
     private fun toDesignCoord(windowX: Double, windowY: Double): Offset {
-        val scaleFactor = window.scaleFactor
-        val fbX = windowX * scaleFactor
-        val fbY = windowY * scaleFactor
+        val guiScale = window.guiScale
+        val fbX = windowX * guiScale
+        val fbY = windowY * guiScale
 
         val designX = ((fbX - renderOffsetX) / renderScale).toFloat()
         val designY = ((fbY - renderOffsetY) / renderScale).toFloat()
@@ -178,7 +187,7 @@ abstract class ComposeScreen(title: Component) : Screen(title) {
         )
     }
 
-    override fun resize(client: Minecraft?, width: Int, height: Int) {
+    override fun resize(client: Minecraft, width: Int, height: Int) {
         surface?.close()
         renderTarget?.close()
         surface = null
@@ -236,7 +245,7 @@ abstract class ComposeScreen(title: Component) : Screen(title) {
     }
 
     override fun keyPressed(keyCode: Int, scanCode: Int, modifiers: Int): Boolean {
-        if (keyCode == GLFW.GLFW_KEY_ESCAPE) return close().let { true }
+        if (keyCode == GLFW.GLFW_KEY_ESCAPE) { mc.setScreen(null); return true }
         sendKeyEvent(
             KeyEvent.KEY_PRESSED,
             glfwToAwtKeyCode(keyCode),
@@ -258,9 +267,9 @@ abstract class ComposeScreen(title: Component) : Screen(title) {
 
     override fun shouldCloseOnEsc() = false
 
-    override fun close() {
+    override fun removed() {
         closeSkiaResources()
         composeScene?.close()
-        super.close()
+        super.removed()
     }
 }

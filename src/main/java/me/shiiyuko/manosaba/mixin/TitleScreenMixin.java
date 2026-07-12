@@ -8,10 +8,10 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(TitleScreen.class)
+@Mixin(value = TitleScreen.class, remap = false)
 public class TitleScreenMixin {
 
-    @Inject(method = "init", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "init", at = @At("HEAD"), cancellable = true, remap = false)
     private void onInit(CallbackInfo ci) {
         Minecraft client = Minecraft.getInstance();
         client.setScreen(new ManosabaTitleScreen());

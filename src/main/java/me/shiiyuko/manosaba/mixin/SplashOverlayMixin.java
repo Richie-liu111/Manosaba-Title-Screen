@@ -1,12 +1,11 @@
 package me.shiiyuko.manosaba.mixin;
 
 import me.shiiyuko.manosaba.splash.SplashOverlayRenderer;
+import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.Overlay;
-import net.minecraft.client.gui.screens.SplashOverlay;
-import net.minecraft.server.packs.resources.ResourceReload;
-import net.minecraft.util.Util;
+import net.minecraft.client.gui.screens.LoadingOverlay;
+import net.minecraft.server.packs.resources.ReloadInstance;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -17,75 +16,78 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-@Mixin(SplashOverlay.class)
+@Mixin(value = LoadingOverlay.class, remap = false)
 public abstract class SplashOverlayMixin {
 
     @Shadow
     @Final
-    private Minecraft client;
+    private Minecraft minecraft;
 
     @Shadow
     @Final
-    private ResourceReload reload;
+    private ReloadInstance reload;
 
     @Shadow
     @Final
-    private Consumer<Optional<Throwable>> exceptionHandler;
+    private Consumer<Optional<Throwable>> onFinish;
 
     @Shadow
     @Final
-    private boolean reloading;
+    private boolean fadeIn;
 
     @Shadow
-    private long reloadCompleteTime;
+    private long fadeOutStart;
 
     @Shadow
-    private long reloadStartTime;
+    private long fadeInStart;
 
-    @Inject(method = "render", at = @At("HEAD"), cancellable = true)
+    @Shadow
+    private float currentProgress;
+
+    @Inject(method = "render", at = @At("HEAD"), cancellable = true, remap = false)
     private void onRender(GuiGraphics context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         ci.cancel();
 
-        long currentTime = Util.getMeasuringTimeMs();
+        long currentTime = Util.getMillis();
 
-        if (this.reloading && this.reloadStartTime == -1L) {
-            this.reloadStartTime = currentTime;
+        if (this.fadeIn && this.fadeInStart == -1L) {
+            this.fadeInStart = currentTime;
         }
 
-        float fadeOutProgress = this.reloadCompleteTime > -1L
-            ? (float)(currentTime - this.reloadCompleteTime) / 1000.0F
+        float fadeOutProgress = this.fadeOutStart > -1L
+            ? (float)(currentTime - this.fadeOutStart) / 1000.0F
             : -1.0F;
-        float fadeInProgress = this.reloadStartTime > -1L
-            ? (float)(currentTime - this.reloadStartTime) / 500.0F
+        float fadeInProgress = this.fadeInStart > -1L
+            ? (float)(currentTime - this.fadeInStart) / 500.0F
             : -1.0F;
 
-        float loadProgress = this.reload.getProgress();
+        float loadProgress = this.reload.getActualProgress();
 
         float logoAlpha = 1.0F;
         if (fadeOutProgress >= 0.0F) {
             logoAlpha = Math.max(0.0F, 1.0F - fadeOutProgress);
-        } else if (this.reloading && fadeInProgress < 1.0F) {
+        } else if (this.fadeIn && fadeInProgress < 1.0F) {
             logoAlpha = Math.max(0.15F, fadeInProgress);
         }
 
         SplashOverlayRenderer.render(loadProgress, logoAlpha);
 
         if (fadeOutProgress >= 2.0F) {
-            this.client.setOverlay((Overlay) null);
+            this.minecraft.setOverlay(null);
             SplashOverlayRenderer.cleanup();
         }
 
-        if (this.reloadCompleteTime == -1L && this.reload.isComplete() && (!this.reloading || fadeInProgress >= 2.0F)) {
+        if (this.fadeOutStart == -1L && this.reload.isDone() && (!this.fadeIn || fadeInProgress >= 2.0F)) {
             try {
-                this.reload.throwException();
-                this.exceptionHandler.accept(Optional.empty());
+                this.reload.checkExceptions();
+                this.onFinish.accept(Optional.empty());
             } catch (Throwable throwable) {
-                this.exceptionHandler.accept(Optional.of(throwable));
+                this.onFinish.accept(Optional.of(throwable));
             }
 
-            this.reloadCompleteTime = Util.getMeasuringTimeMs();
-            if (this.client.screen != null) {
-                this.client.screen.init(this.client, context.guiWidth(), context.guiHeight());
+            this.fadeOutStart = Util.getMillis();
+            if (this.minecraft.screen != null) {
+                this.minecraft.screen.init(this.minecraft, context.guiWidth(), context.guiHeight());
             }
         }
     }

@@ -1,12 +1,13 @@
 package me.shiiyuko.manosaba
 
+import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.core.registries.Registries
+import net.minecraft.resources.ResourceKey
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.sounds.SoundEvent
 import net.neoforged.bus.api.IEventBus
 import net.neoforged.fml.common.Mod
 import net.neoforged.neoforge.registries.DeferredRegister
-import net.neoforged.neoforge.registries.RegistryObject
 import org.slf4j.LoggerFactory
 
 /**
@@ -27,10 +28,12 @@ class Manosaba(modBus: IEventBus) {
         val SOUND_EVENTS: DeferredRegister<SoundEvent> =
             DeferredRegister.create(Registries.SOUND_EVENT, MOD_ID)
 
-        /** Title screen BGM sound event */
-        val TITLE_MUSIC: RegistryObject<SoundEvent> = SOUND_EVENTS.register("music") {
-            SoundEvent.createVariableRangeEvent(TITLE_MUSIC_ID)
-        }
+        /** Title screen BGM sound event - stored as ResourceKey for lookup */
+        private val TITLE_MUSIC_KEY: ResourceKey<SoundEvent> =
+            ResourceKey.create(Registries.SOUND_EVENT, TITLE_MUSIC_ID)
+
+        fun getTitleMusic(): SoundEvent =
+            BuiltInRegistries.SOUND_EVENT.get(TITLE_MUSIC_KEY) ?: error("Missing title music")
     }
 
     init {
