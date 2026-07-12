@@ -1,289 +1,183 @@
 package me.shiiyuko.manosaba.ui
 
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsHoveredAsState
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.BasicText
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.*
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.platform.Font
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import kotlinx.coroutines.delay
 import me.shiiyuko.manosaba.Manosaba
-import me.shiiyuko.manosaba.utils.SpriteAtlas
 import me.shiiyuko.manosaba.utils.UnitySpriteParser
+import net.minecraft.Util
 import net.minecraft.SharedConstants
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen
+import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.screens.Screen
+import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen
 import net.minecraft.client.gui.screens.options.OptionsScreen
 import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen
 import net.minecraft.client.gui.screens.worldselection.SelectWorldScreen
 import net.minecraft.client.resources.sounds.SimpleSoundInstance
 import net.minecraft.network.chat.Component
-import org.jetbrains.skia.FilterTileMode
-import org.jetbrains.skia.Image
-import org.jetbrains.skia.ImageFilter
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.util.Mth
 
-private const val BUTTON_SCALE = 0.375f
-private const val LOGO_SCALE = 0.5f
-private const val IMAGE_SCALE = 1.3f
+class ManosabaTitleScreen : Screen(Component.literal("")) {
 
-val manosabaFont: FontFamily = FontFamily(Font(resource = "assets/TsukushiMincho.otf"))
+    companion object {
+        private val BACKGROUND_TEX = ResourceLocation.fromNamespaceAndPath("manosaba", "textures/ui/background.png")
+        private val UI_TITLE_TEX = ResourceLocation.fromNamespaceAndPath("manosaba", "textures/ui/ui_title.png")
+        private val UI_DIALOG_TEX = ResourceLocation.fromNamespaceAndPath("manosaba", "textures/ui/ui_dialog.png")
+        private val UI_COMMON_TEX = ResourceLocation.fromNamespaceAndPath("manosaba", "textures/ui/ui_common.png")
 
-class ManosabaTitleScreen : ComposeScreen(Component.literal("Manosaba Title Screen")) {
+        private const val BUTTON_SCALE = 0.375f
+        private const val LOGO_SCALE = 0.5f
+        private const val ANIM_DURATION = 2500L
+    }
 
-    private var atlasImage: Image? = null
-    private var atlasData: SpriteAtlas? = null
-    private var buttonSprites: Map<String, ImageBitmap>? = null
-    private var titleLogo: ImageBitmap? = null
-    private var titleOverlay: ImageBitmap? = null
+    private var titleJsonData: String? = null
+    private var dialogJsonData: String? = null
+    private var commonJsonData: String? = null
 
-    private var showExitDialog by mutableStateOf(false)
-    private var exitDialog: ExitDialog? = null
-
-    private val buttonNames = listOf(
-        "Button_NewGame", "Button_LoadGame", "Button_Options",
-        "Button_Exit", "Button_Gallery", "Button_WitchBook"
+    private data class ButtonDef(
+        val name: String,
+        val yOffset: Int,
+        val normal: String,
+        val highlighted: String,
+        val action: () -> Unit
     )
 
-    init {
-        loadAtlasResources()
-        exitDialog = ExitDialog(
-            onCancel = { showExitDialog = false },
-            onConfirm = { Minecraft.getInstance().stop() }
-        )
+    private val buttons = mutableListOf<ButtonDef>()
+    private var hoveredButtonIndex = -1
+    private var openTime = 0L
+    private var showExitDialog = false
+
+    override fun init() {
+        openTime = Util.getMillis()
+        loadResourceJson()
+        setupButtons()
+        playBgm()
     }
 
-    override fun removed() {
-        super.removed()
+    private fun setupButtons() {
+        buttons.clear()
+        buttons.add(ButtonDef("LoadGame", 20, "Button_LoadGame_Normal", "Button_LoadGame_Highlighted") {
+            minecraft!!.setScreen(SelectWorldScreen(this))
+        })
+        buttons.add(ButtonDef("NewGame", -20, "Button_NewGame_Normal", "Button_NewGame_Highlighted") {
+            CreateWorldScreen.openFresh(minecraft!!, this)
+        })
+        buttons.add(ButtonDef("Gallery", 20, "Button_Gallery_Normal", "Button_Gallery_Highlighted") {
+            minecraft!!.setScreen(JoinMultiplayerScreen(this))
+        })
+        buttons.add(ButtonDef("Options", -20, "Button_Options_Normal", "Button_Options_Highlighted") {
+            minecraft!!.setScreen(OptionsScreen(this, minecraft!!.options))
+        })
+        buttons.add(ButtonDef("Exit", 20, "Button_Exit_Normal", "Button_Exit_Highlighted") {
+            showExitDialog = true
+        })
     }
 
-    private fun playMusic() {
-        val client = Minecraft.getInstance()
-
-        client.soundManager.stop()
-        client.musicManager.stopPlaying()
-
-        val sound = SimpleSoundInstance.forMusic(Manosaba.getTitleMusic())
-        client.soundManager.play(sound)
-    }
-
-    private fun loadAtlasResources() = runCatching {
-        val image = UnitySpriteParser.loadAtlasImageFromResources("/assets/UI_Title.png") ?: return@runCatching
-        val data = UnitySpriteParser.loadAtlasDataFromResources("/assets/UI_Title.json") ?: return@runCatching
-
-        atlasImage = image
-        atlasData = data
-
-        buttonSprites = buttonNames.flatMap { name ->
-            listOf("${name}_Normal", "${name}_Highlighted")
-        }.mapNotNull { spriteName ->
-            data.sprites[spriteName]?.let { spriteData ->
-                spriteName to UnitySpriteParser.cropSprite(image, spriteData).toComposeImageBitmap()
-            }
-        }.toMap()
-
-        titleLogo = data.sprites["TitleLogo@Ja"]?.let { spriteData ->
-            UnitySpriteParser.cropSprite(image, spriteData).toComposeImageBitmap()
-        }
-
-        titleOverlay = data.sprites["TitleOverlay"]?.let { spriteData ->
-            UnitySpriteParser.cropSprite(image, spriteData).toComposeImageBitmap()
-        }
+    private fun loadResourceJson() = runCatching {
+        titleJsonData = javaClass.getResourceAsStream("/assets/manosaba/textures/ui/ui_title.json")
+            ?.bufferedReader()?.readText()
+        dialogJsonData = javaClass.getResourceAsStream("/assets/manosaba/textures/ui/ui_dialog.json")
+            ?.bufferedReader()?.readText()
+        commonJsonData = javaClass.getResourceAsStream("/assets/manosaba/textures/ui/ui_common.json")
+            ?.bufferedReader()?.readText()
     }.onFailure { it.printStackTrace() }
 
-    @Composable
-    override fun Content() {
-        val client = Minecraft.getInstance()
-        val backgroundImage = remember { loadBackgroundImage() }
-        val sprites = remember { buttonSprites }
-        val logo = remember { titleLogo }
-        val overlay = remember { titleOverlay }
-        val versionText = remember { "Ver. ${SharedConstants.getCurrentVersion().name}" }
+    private fun playBgm() {
+        val music = Manosaba.getTitleMusic() ?: return
+        val mc = Minecraft.getInstance()
+        mc.soundManager.stop()
+        mc.musicManager.stopPlaying()
+        mc.soundManager.play(SimpleSoundInstance.forMusic(music))
+    }
 
-        val backgroundAnimProgress = remember { Animatable(0f) }
-        val uiAlpha = remember { Animatable(0f) }
+    // Lazy-parsed sprite data (parsed once on first access from render thread)
+    private val titleAtlas by lazy { titleJsonData?.let { UnitySpriteParser.parseAtlas(it) } }
+    private val dialogAtlas by lazy { dialogJsonData?.let { UnitySpriteParser.parseAtlas(it) } }
+    private val commonAtlas by lazy { commonJsonData?.let { UnitySpriteParser.parseAtlas(it) } }
 
-        LaunchedEffect(Unit) {
-            playMusic()
-            backgroundAnimProgress.animateTo(
-                targetValue = 1f,
-                animationSpec = tween(durationMillis = 2500, easing = FastOutSlowInEasing)
-            )
-            delay(250L)
-            uiAlpha.animateTo(
-                targetValue = 1f,
-                animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing)
-            )
+    override fun render(gfx: GuiGraphics, mouseX: Int, mouseY: Int, delta: Float) {
+        val elapsed = Util.getMillis() - openTime
+        val dt = Mth.clamp(elapsed / ANIM_DURATION.toFloat(), 0f, 1f)
+        val alpha = dt
+        val scale = 1.1f - (0.1f * dt)
+
+        // Background with scale animation
+        val bw = (width * scale).toInt()
+        val bh = (height * scale).toInt()
+        val ox = (bw - width) / 2
+        val oy = (bh - height) / 2
+        gfx.blit(BACKGROUND_TEX, -ox, -oy, 0f, 0f, bw, bh, bw, bh)
+
+        val atlasSize = 4096 // UI_Title.png is 4096 pixels tall
+        val titleTexW = 512 // approximate width of UI_Title.png
+
+        // Title Overlay
+        titleAtlas?.sprites?.get("TitleOverlay")?.let { sp ->
+            gfx.setColor(1f, 1f, 1f, alpha)
+            gfx.blit(UI_TITLE_TEX, 0, 0, sp.x, sp.y, sp.width.toInt(), sp.height.toInt(), titleTexW, atlasSize)
         }
 
-        val scale = 1.1f - (0.1f * backgroundAnimProgress.value)
-        val blurAmount = 20f * (1f - backgroundAnimProgress.value)
+        // Logo (top right)
+        titleAtlas?.sprites?.get("TitleLogo@Ja")?.let { sp ->
+            val lw = (sp.width * LOGO_SCALE).toInt()
+            val lh = (sp.height * LOGO_SCALE).toInt()
+            gfx.setColor(1f, 1f, 1f, alpha)
+            gfx.blit(UI_TITLE_TEX, width - lw - 24, 24, sp.x, sp.y, lw, lh, sp.width.toInt(), sp.height.toInt())
+        }
 
-        Box(modifier = Modifier.fillMaxSize()) {
-            backgroundImage?.let { bitmap ->
-                Image(
-                    bitmap = bitmap,
-                    contentDescription = "Background",
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .graphicsLayer {
-                            scaleX = scale
-                            scaleY = scale
-                            if (blurAmount > 0.1f) {
-                                renderEffect = ImageFilter.makeBlur(
-                                    blurAmount, blurAmount, FilterTileMode.CLAMP
-                                ).asComposeRenderEffect()
-                            }
-                        },
-                    contentScale = ContentScale.Crop
-                )
+        // Buttons
+        val buttonBaseX = 24
+        buttons.forEachIndexed { idx, btn ->
+            val spriteName = if (idx == hoveredButtonIndex) btn.highlighted else btn.normal
+            titleAtlas?.sprites?.get(spriteName)?.let { sp ->
+                val sw = (sp.width * BUTTON_SCALE).toInt()
+                val sh = (sp.height * BUTTON_SCALE).toInt()
+                val sy = height - 24 - sh + btn.yOffset
+                gfx.setColor(1f, 1f, 1f, alpha)
+                gfx.blit(UI_TITLE_TEX, buttonBaseX, sy, sp.x, sp.y, sw, sh, sp.width.toInt(), sp.height.toInt())
             }
+        }
 
-            overlay?.let { overlayBitmap ->
-                Image(
-                    bitmap = overlayBitmap,
-                    contentDescription = "Title Overlay",
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .graphicsLayer { alpha = uiAlpha.value },
-                    contentScale = ContentScale.FillBounds
-                )
-            }
+        // Version text
+        val version = "Ver. ${SharedConstants.getCurrentVersion().name}"
+        gfx.setColor(1f, 1f, 1f, alpha)
+        gfx.drawString(font, version, width - font.width(version) - 48, height - 24, 0xFFFFFF)
 
-            logo?.let { logoBitmap ->
-                Image(
-                    bitmap = logoBitmap,
-                    contentDescription = "Title Logo",
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .padding(top = 24.dp, end = 24.dp)
-                        .size(
-                            width = (logoBitmap.width * LOGO_SCALE).dp,
-                            height = (logoBitmap.height * LOGO_SCALE).dp
-                        )
-                        .graphicsLayer { alpha = uiAlpha.value }
-                )
-            }
+        // Reset color
+        gfx.setColor(1f, 1f, 1f, 1f)
+    }
 
-            sprites?.let { spriteMap ->
-                val showLoad: () -> Unit = { client.setScreen(SelectWorldScreen(this@ManosabaTitleScreen)) }
-                val showNewGame: () -> Unit = { CreateWorldScreen.openFresh(client, this@ManosabaTitleScreen) }
-                val showGallery: () -> Unit = { client.setScreen(JoinMultiplayerScreen(this@ManosabaTitleScreen)) }
-                val showOptions: () -> Unit = { client.setScreen(OptionsScreen(this@ManosabaTitleScreen, client.options)) }
-                val showExit: () -> Unit = { showExitDialog = true }
+    override fun mouseClicked(mx: Double, my: Double, button: Int): Boolean {
+        if (showExitDialog) return true
 
-                val buttons = listOf(
-                    ButtonConfig("LoadGame", 20, onClick = showLoad),
-                    ButtonConfig("NewGame", -20, onClick = showNewGame),
-                    ButtonConfig("Gallery", 20, onClick = showGallery),
-                    ButtonConfig("Options", -20, onClick = showOptions),
-                    ButtonConfig("Exit", 20, onClick = showExit)
-                )
-
-                Row(
-                    modifier = Modifier
-                        .align(Alignment.BottomStart)
-                        .padding(start = 24.dp, bottom = 24.dp)
-                        .graphicsLayer { alpha = uiAlpha.value },
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    buttons.forEach { config ->
-                        SpriteButton(
-                            normalSprite = spriteMap["Button_${config.name}_Normal"],
-                            highlightedSprite = spriteMap["Button_${config.name}_Highlighted"],
-                            scale = BUTTON_SCALE,
-                            imageScale = IMAGE_SCALE,
-                            modifier = Modifier.offset(y = config.yOffset.dp),
-                            onClick = config.onClick
-                        )
-                    }
+        val bx = 24
+        buttons.forEachIndexed { idx, btn ->
+            titleAtlas?.sprites?.get(btn.normal)?.let { sp ->
+                val sw = (sp.width * BUTTON_SCALE).toInt()
+                val sh = (sp.height * BUTTON_SCALE).toInt()
+                val sy = height - 24 - sh + btn.yOffset
+                if (mx.toInt() in bx..<bx + sw && my.toInt() in sy..<sy + sh) {
+                    btn.action()
+                    return true
                 }
             }
+        }
+        return super.mouseClicked(mx, my, button)
+    }
 
-            BasicText(
-                text = versionText,
-                style = TextStyle(
-                    fontFamily = manosabaFont,
-                    color = Color.White,
-                    fontSize = 20.sp,
-                    shadow = Shadow(
-                        color = Color.Black.copy(alpha = 0.7f),
-                        blurRadius = 4f
-                    )
-                ),
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(end = 48.dp, bottom = 24.dp)
-                    .graphicsLayer { alpha = uiAlpha.value }
-            )
-
-            if (showExitDialog) {
-                exitDialog?.Content()
+    override fun mouseMoved(mx: Double, my: Double) {
+        hoveredButtonIndex = -1
+        val bx = 24
+        buttons.forEachIndexed { idx, btn ->
+            titleAtlas?.sprites?.get(btn.normal)?.let { sp ->
+                val sw = (sp.width * BUTTON_SCALE).toInt()
+                val sh = (sp.height * BUTTON_SCALE).toInt()
+                val sy = height - 24 - sh + btn.yOffset
+                if (mx.toInt() in bx..<bx + sw && my.toInt() in sy..<sy + sh) {
+                    hoveredButtonIndex = idx
+                }
             }
         }
     }
 
-    private fun loadBackgroundImage(): ImageBitmap? = runCatching {
-        javaClass.getResourceAsStream("/assets/background_ema.png")?.use {
-            Image.makeFromEncoded(it.readBytes()).toComposeImageBitmap()
-        }
-    }.onFailure { it.printStackTrace() }.getOrNull()
-}
-
-private data class ButtonConfig(
-    val name: String,
-    val yOffset: Int,
-    val onClick: () -> Unit
-)
-
-@Composable
-private fun SpriteButton(
-    normalSprite: ImageBitmap?,
-    highlightedSprite: ImageBitmap?,
-    onClick: () -> Unit,
-    scale: Float = 0.5f,
-    imageScale: Float = 1f,
-    modifier: Modifier = Modifier
-) {
-    normalSprite ?: return
-
-    val interactionSource = remember { MutableInteractionSource() }
-    val isHovered by interactionSource.collectIsHoveredAsState()
-    val currentSprite = highlightedSprite?.takeIf { isHovered } ?: normalSprite
-
-    Box(
-        modifier = modifier
-            .size(
-                width = (normalSprite.width * scale).dp,
-                height = (normalSprite.height * scale).dp
-            )
-            .clickable(
-                interactionSource = interactionSource,
-                indication = null,
-                onClick = onClick
-            ),
-        contentAlignment = Alignment.Center
-    ) {
-        Image(
-            bitmap = currentSprite,
-            contentDescription = null,
-            modifier = Modifier.graphicsLayer {
-                scaleX = imageScale
-                scaleY = imageScale
-            }
-        )
-    }
+    override fun shouldCloseOnEsc() = false
 }

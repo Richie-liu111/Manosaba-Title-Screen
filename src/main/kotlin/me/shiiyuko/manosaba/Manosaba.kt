@@ -32,8 +32,9 @@ class Manosaba(modBus: IEventBus) {
         private val TITLE_MUSIC_KEY: ResourceKey<SoundEvent> =
             ResourceKey.create(Registries.SOUND_EVENT, TITLE_MUSIC_ID)
 
-        fun getTitleMusic(): SoundEvent =
-            BuiltInRegistries.SOUND_EVENT.get(TITLE_MUSIC_KEY) ?: error("Missing title music")
+        /** Look up the registered sound event. Returns null before registration completes. */
+        fun getTitleMusic(): SoundEvent? =
+            BuiltInRegistries.SOUND_EVENT.get(TITLE_MUSIC_KEY)
     }
 
     init {

@@ -27,13 +27,16 @@ This project is for learning and personal use only. No commercial use.
 [[dependencies.manosaba]]
 modId="neoforge"
 type="required"
-versionRange="[${neo_version},)"
+versionRange="[21.1.194,)"
 ordering="NONE"
 side="CLIENT"
 
 [[dependencies.manosaba]]
 modId="minecraft"
 type="required"
-versionRange="[${minecraft_version},1.22)"
+versionRange="[1.21.1,1.22)"
 ordering="NONE"
 side="CLIENT"
+
+[[mixins]]
+config="manosaba.mixins.json"

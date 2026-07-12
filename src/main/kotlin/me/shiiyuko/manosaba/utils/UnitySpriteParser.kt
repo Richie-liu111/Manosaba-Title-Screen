@@ -2,9 +2,6 @@ package me.shiiyuko.manosaba.utils
 
 import com.google.gson.Gson
 import com.google.gson.JsonObject
-import org.jetbrains.skia.Image
-import org.jetbrains.skia.Rect
-import org.jetbrains.skia.Surface
 import java.io.InputStream
 
 data class SpriteData(
@@ -51,23 +48,6 @@ object UnitySpriteParser {
         return SpriteAtlas(atlasName, sprites)
     }
 
-    fun cropSprite(atlas: Image, sprite: SpriteData, atlasHeight: Int = atlas.height): Image {
-        val skiaY = atlasHeight - sprite.y - sprite.height
-        val (width, height) = sprite.width.toInt() to sprite.height.toInt()
-
-        return Surface.makeRasterN32Premul(width, height).run {
-            canvas.drawImageRect(
-                atlas,
-                Rect.makeXYWH(sprite.x, skiaY, sprite.width, sprite.height),
-                Rect.makeWH(sprite.width, sprite.height)
-            )
-            makeImageSnapshot()
-        }
-    }
-
     fun loadAtlasDataFromResources(jsonPath: String): SpriteAtlas? =
         javaClass.getResourceAsStream(jsonPath)?.use { parseAtlas(it) }
-
-    fun loadAtlasImageFromResources(imagePath: String): Image? =
-        javaClass.getResourceAsStream(imagePath)?.use { Image.makeFromEncoded(it.readBytes()) }
 }

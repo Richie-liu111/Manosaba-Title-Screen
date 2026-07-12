@@ -70,7 +70,7 @@ public abstract class SplashOverlayMixin {
             logoAlpha = Math.max(0.15F, fadeInProgress);
         }
 
-        SplashOverlayRenderer.render(loadProgress, logoAlpha);
+        SplashOverlayRenderer.render(context, loadProgress, logoAlpha);
 
         if (fadeOutProgress >= 2.0F) {
             this.minecraft.setOverlay(null);
