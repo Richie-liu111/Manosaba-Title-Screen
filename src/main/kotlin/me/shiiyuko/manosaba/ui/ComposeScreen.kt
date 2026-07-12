@@ -15,10 +15,10 @@ import com.mojang.blaze3d.systems.RenderSystem
 import me.shiiyuko.manosaba.utils.AWTUtils
 import me.shiiyuko.manosaba.utils.GlStateUtils
 import me.shiiyuko.manosaba.utils.glfwToAwtKeyCode
-import net.minecraft.client.MinecraftClient
-import net.minecraft.client.gui.DrawContext
-import net.minecraft.client.gui.screen.Screen
-import net.minecraft.text.Text
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.screens.Screen
+import net.minecraft.network.chat.Component
 import org.jetbrains.skia.BackendRenderTarget
 import org.jetbrains.skia.ColorSpace
 import org.jetbrains.skia.DirectContext
@@ -33,14 +33,14 @@ import java.awt.event.MouseEvent
 import kotlin.math.max
 
 @OptIn(InternalComposeUiApi::class)
-abstract class ComposeScreen(title: Text) : Screen(title) {
+abstract class ComposeScreen(title: Component) : Screen(title) {
 
     companion object {
         const val DESIGN_WIDTH = 1920f
         const val DESIGN_HEIGHT = 1080f
     }
 
-    private val mc = MinecraftClient.getInstance()
+    private val mc = Minecraft.getInstance()
     private var skiaContext: DirectContext? = null
     private var surface: Surface? = null
     private var renderTarget: BackendRenderTarget? = null
@@ -84,7 +84,7 @@ abstract class ComposeScreen(title: Text) : Screen(title) {
         skiaContext = DirectContext.makeGL()
         renderTarget = BackendRenderTarget.makeGL(
             frameWidth, frameHeight, 0, 8,
-            mc.framebuffer.fbo, FramebufferFormat.GR_GL_RGBA8
+            mc.mainRenderTarget.frameBufferId, FramebufferFormat.GR_GL_RGBA8
         )
         surface = Surface.makeFromBackendRenderTarget(
             skiaContext!!, renderTarget!!, SurfaceOrigin.BOTTOM_LEFT,
@@ -104,7 +104,7 @@ abstract class ComposeScreen(title: Text) : Screen(title) {
         renderOffsetY = (fbHeight - DESIGN_HEIGHT * renderScale) / 2f
     }
 
-    override fun render(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
+    override fun render(context: GuiGraphics, mouseX: Int, mouseY: Int, delta: Float) {
         if (composeScene == null) {
             initCompose()
         }
@@ -178,7 +178,7 @@ abstract class ComposeScreen(title: Text) : Screen(title) {
         )
     }
 
-    override fun resize(client: MinecraftClient?, width: Int, height: Int) {
+    override fun resize(client: Minecraft?, width: Int, height: Int) {
         surface?.close()
         renderTarget?.close()
         surface = null

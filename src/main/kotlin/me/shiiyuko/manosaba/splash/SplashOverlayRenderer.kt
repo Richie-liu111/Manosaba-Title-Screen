@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import com.mojang.blaze3d.systems.RenderSystem
 import me.shiiyuko.manosaba.utils.GlStateUtils
 import me.shiiyuko.manosaba.utils.UnitySpriteParser
-import net.minecraft.client.MinecraftClient
+import net.minecraft.client.Minecraft
 import org.jetbrains.skia.*
 import org.lwjgl.opengl.GL33C
 import kotlin.math.max
@@ -31,7 +31,7 @@ object SplashOverlayRenderer {
     private const val DESIGN_WIDTH = 1920f
     private const val DESIGN_HEIGHT = 1080f
 
-    private val mc = MinecraftClient.getInstance()
+    private val mc = Minecraft.getInstance()
     private var skiaContext: DirectContext? = null
     private var surface: Surface? = null
     private var renderTarget: BackendRenderTarget? = null
@@ -98,7 +98,7 @@ object SplashOverlayRenderer {
         skiaContext = DirectContext.makeGL()
         renderTarget = BackendRenderTarget.makeGL(
             frameWidth, frameHeight, 0, 8,
-            mc.framebuffer.fbo, FramebufferFormat.GR_GL_RGBA8
+            mc.mainRenderTarget.frameBufferId, FramebufferFormat.GR_GL_RGBA8
         )
         surface = Surface.makeFromBackendRenderTarget(
             skiaContext!!, renderTarget!!, SurfaceOrigin.BOTTOM_LEFT,

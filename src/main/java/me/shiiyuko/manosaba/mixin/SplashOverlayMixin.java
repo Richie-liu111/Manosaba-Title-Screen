@@ -1,11 +1,11 @@
 package me.shiiyuko.manosaba.mixin;
 
 import me.shiiyuko.manosaba.splash.SplashOverlayRenderer;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Overlay;
-import net.minecraft.client.gui.screen.SplashOverlay;
-import net.minecraft.resource.ResourceReload;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.Overlay;
+import net.minecraft.client.gui.screens.SplashOverlay;
+import net.minecraft.server.packs.resources.ResourceReload;
 import net.minecraft.util.Util;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -22,7 +22,7 @@ public abstract class SplashOverlayMixin {
 
     @Shadow
     @Final
-    private MinecraftClient client;
+    private Minecraft client;
 
     @Shadow
     @Final
@@ -43,7 +43,7 @@ public abstract class SplashOverlayMixin {
     private long reloadStartTime;
 
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
-    private void onRender(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+    private void onRender(GuiGraphics context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         ci.cancel();
 
         long currentTime = Util.getMeasuringTimeMs();
@@ -71,7 +71,7 @@ public abstract class SplashOverlayMixin {
         SplashOverlayRenderer.render(loadProgress, logoAlpha);
 
         if (fadeOutProgress >= 2.0F) {
-            this.client.setOverlay(null);
+            this.client.setOverlay((Overlay) null);
             SplashOverlayRenderer.cleanup();
         }
 
@@ -84,8 +84,8 @@ public abstract class SplashOverlayMixin {
             }
 
             this.reloadCompleteTime = Util.getMeasuringTimeMs();
-            if (this.client.currentScreen != null) {
-                this.client.currentScreen.init(this.client, context.getScaledWindowWidth(), context.getScaledWindowHeight());
+            if (this.client.screen != null) {
+                this.client.screen.init(this.client, context.guiWidth(), context.guiHeight());
             }
         }
     }

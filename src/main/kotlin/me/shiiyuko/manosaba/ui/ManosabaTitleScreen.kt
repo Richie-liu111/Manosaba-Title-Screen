@@ -24,13 +24,13 @@ import me.shiiyuko.manosaba.Manosaba
 import me.shiiyuko.manosaba.utils.SpriteAtlas
 import me.shiiyuko.manosaba.utils.UnitySpriteParser
 import net.minecraft.SharedConstants
-import net.minecraft.client.MinecraftClient
-import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen
-import net.minecraft.client.gui.screen.option.OptionsScreen
-import net.minecraft.client.gui.screen.world.CreateWorldScreen
-import net.minecraft.client.gui.screen.world.SelectWorldScreen
-import net.minecraft.client.sound.PositionedSoundInstance
-import net.minecraft.text.Text
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.screens.multiplayer.MultiplayerScreen
+import net.minecraft.client.gui.screens.options.OptionsScreen
+import net.minecraft.client.gui.screens.world.CreateWorldScreen
+import net.minecraft.client.gui.screens.world.SelectWorldScreen
+import net.minecraft.client.resources.sounds.SimpleSoundInstance
+import net.minecraft.network.chat.Component
 import org.jetbrains.skia.FilterTileMode
 import org.jetbrains.skia.Image
 import org.jetbrains.skia.ImageFilter
@@ -41,7 +41,7 @@ private const val IMAGE_SCALE = 1.3f
 
 val manosabaFont: FontFamily = FontFamily(Font(resource = "assets/TsukushiMincho.otf"))
 
-class ManosabaTitleScreen : ComposeScreen(Text.literal("Manosaba Title Screen")) {
+class ManosabaTitleScreen : ComposeScreen(Component.literal("Manosaba Title Screen")) {
 
     private var atlasImage: Image? = null
     private var atlasData: SpriteAtlas? = null
@@ -61,7 +61,7 @@ class ManosabaTitleScreen : ComposeScreen(Text.literal("Manosaba Title Screen"))
         loadAtlasResources()
         exitDialog = ExitDialog(
             onCancel = { showExitDialog = false },
-            onConfirm = { MinecraftClient.getInstance().scheduleStop() }
+            onConfirm = { Minecraft.getInstance().stop() }
         )
     }
 
@@ -70,12 +70,12 @@ class ManosabaTitleScreen : ComposeScreen(Text.literal("Manosaba Title Screen"))
     }
 
     private fun playMusic() {
-        val client = MinecraftClient.getInstance()
+        val client = Minecraft.getInstance()
 
         client.soundManager.stopAll()
         client.musicTracker.stop()
 
-        val sound = PositionedSoundInstance.music(Manosaba.TITLE_MUSIC.value())
+        val sound = SimpleSoundInstance.forMusic(Manosaba.TITLE_MUSIC.get())
         client.soundManager.play(sound)
     }
 
@@ -105,12 +105,12 @@ class ManosabaTitleScreen : ComposeScreen(Text.literal("Manosaba Title Screen"))
 
     @Composable
     override fun Content() {
-        val client = MinecraftClient.getInstance()
+        val client = Minecraft.getInstance()
         val backgroundImage = remember { loadBackgroundImage() }
         val sprites = remember { buttonSprites }
         val logo = remember { titleLogo }
         val overlay = remember { titleOverlay }
-        val versionText = remember { "Ver. ${SharedConstants.getGameVersion().name}" }
+        val versionText = remember { "Ver. ${SharedConstants.getCurrentVersion().name}" }
 
         val backgroundAnimProgress = remember { Animatable(0f) }
         val uiAlpha = remember { Animatable(0f) }

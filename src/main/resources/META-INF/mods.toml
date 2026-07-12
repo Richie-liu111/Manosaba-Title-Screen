@@ -1,0 +1,39 @@
+modLoader="javafml"
+loaderVersion="[4,)"
+license="Apache-2.0"
+issueTrackerURL="https://github.com/Richie-liu111/Manosaba-Title-Screen/issues"
+
+[[mods]]
+modId="manosaba"
+version="${version}"
+displayName="Manosaba Title Screen"
+displayURL="https://github.com/Richie-liu111/Manosaba-Title-Screen"
+logoFile="assets/manosaba/icon.png"
+authors="Shiiyuko, Richie-liu111"
+description='''
+A Minecraft mod that replaces the vanilla title screen and splash screen
+with a custom UI inspired by the visual novel game 魔法少女ノ魔女裁判 (Manosaba).
+
+Features:
+- Custom animated title screen with character background
+- Interactive sprite-based buttons from the original game
+- Custom splash screen with game logos
+- BGM from the original game soundtrack
+
+Assets extracted from the game "魔法少女ノ魔女裁判" — all asset copyrights belong to the original developers.
+This project is for learning and personal use only. No commercial use.
+'''
+
+[[dependencies.manosaba]]
+modId="neoforge"
+type="required"
+versionRange="[${neo_version},)"
+ordering="NONE"
+side="CLIENT"
+
+[[dependencies.manosaba]]
+modId="minecraft"
+type="required"
+versionRange="[${minecraft_version},1.22)"
+ordering="NONE"
+side="CLIENT"

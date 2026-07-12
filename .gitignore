@@ -1,29 +1,39 @@
-# Gradle
-.gradle/
+# NeoForgedGradle / ForgeGradle
 build/
-!gradle/wrapper/gradle-wrapper.jar
-
-# Kotlin
-.kotlin/
-
-# IntelliJ IDEA
-.idea/
-*.iml
-*.ipr
-*.iws
+!build/libs/
+run/
+logs/
 out/
 
-# Runtime
-run/
+# IDE
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+.classpath
+.project
+.settings/
+bin/
 
-# OS generated files
+# OS
 .DS_Store
 Thumbs.db
 
-# Local configuration
+# Gradle
+.gradle/
+!gradle/wrapper/gradle-wrapper.jar
+
+# Java
+*.class
+*.jar
+!gradle/wrapper/gradle-wrapper.jar
+
+# Kotlin
+*.kotlin_module
+.kotlin/
+
+# Local
 local.properties
 *.local
-
-# Logs
 *.log
-logs/
