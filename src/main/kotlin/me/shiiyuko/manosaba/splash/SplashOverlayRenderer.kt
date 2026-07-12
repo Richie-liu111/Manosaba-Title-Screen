@@ -48,35 +48,31 @@ object SplashOverlayRenderer {
     fun render(gfx: GuiGraphics, loadProgress: Float, alpha: Float) {
         load()
 
-        val screenW = gfx.guiWidth()
-        val screenH = gfx.guiHeight()
+        val w = gfx.guiWidth()
+        val h = gfx.guiHeight()
 
         // Black background
-        gfx.fill(0, 0, screenW, screenH, 0xFF000000.toInt())
-
-        // Calculate scale and center
-        val scaleX = screenW / DESIGN_WIDTH
-        val scaleY = screenH / DESIGN_HEIGHT
-        val renderScale = max(scaleX, scaleY)
-        val offsetX = ((screenW - DESIGN_WIDTH * renderScale) / 2f).toInt()
-        val offsetY = ((screenH - DESIGN_HEIGHT * renderScale) / 2f).toInt()
+        gfx.fill(0, 0, w, h, 0xFF000000.toInt())
 
         gfx.setColor(1f, 1f, 1f, alpha)
 
-        // Draw brand logo
+        // Center both logos vertically
+        val brandH = brandLogo?.h?.toInt() ?: 0
+        val compH = companyLogo?.h?.toInt() ?: 0
+        val totalH = brandH + 64 + compH
+        var y = (h - totalH) / 2
+
+        fun flipY(yy: Float, h: Float) = 1024f - yy - h
+
         brandLogo?.let { logo ->
-            val blh = (companyLogo?.h ?: 0f)
-            val lx = offsetX + ((DESIGN_WIDTH * renderScale - logo.w) / 2f).toInt()
-            val ly = offsetY + ((DESIGN_HEIGHT * renderScale - (logo.h + 64f + blh)) / 2f).toInt()
-            gfx.blit(SPLASH_TEX, lx, ly, logo.x, logo.y, logo.w.toInt(), logo.h.toInt(), logo.w.toInt(), logo.h.toInt())
+            val x = (w - logo.w.toInt()) / 2
+            gfx.blit(SPLASH_TEX, x, y, logo.x, flipY(logo.y, logo.h), logo.w.toInt(), logo.h.toInt(), 1024, 1024)
+            y += logo.h.toInt() + 64
         }
 
-        // Draw company logo (below brand logo)
         companyLogo?.let { logo ->
-            val blh = (brandLogo?.h ?: 0f)
-            val lx = offsetX + ((DESIGN_WIDTH * renderScale - logo.w) / 2f).toInt()
-            val ly = offsetY + ((DESIGN_HEIGHT * renderScale - (logo.h + 64f + blh)) / 2f).toInt() + blh.toInt() + 64
-            gfx.blit(SPLASH_TEX, lx, ly, logo.x, logo.y, logo.w.toInt(), logo.h.toInt(), logo.w.toInt(), logo.h.toInt())
+            val x = (w - logo.w.toInt()) / 2
+            gfx.blit(SPLASH_TEX, x, y, logo.x, flipY(logo.y, logo.h), logo.w.toInt(), logo.h.toInt(), 1024, 1024)
         }
 
         gfx.setColor(1f, 1f, 1f, 1f)
