@@ -30,6 +30,11 @@ public class TitleScreenButton implements Renderable, GuiEventListener, Narratab
     private float height;
     private float alpha;
 
+    /** 碰撞检测尺寸（默认 = 纹理尺寸）。原游戏按钮精灵图比容器大，
+     *  碰撞箱应使用容器尺寸，居中于渲染矩形内。 */
+    private float collisionW;
+    private float collisionH;
+
     public boolean visible = true;
     private boolean isHovered = false;
     private boolean isFocused = false;
@@ -52,6 +57,8 @@ public class TitleScreenButton implements Renderable, GuiEventListener, Narratab
         this.textureHover = textureHover;
         this.virtualScreen = virtualScreen;
         this.alpha = alpha;
+        this.collisionW = width;
+        this.collisionH = height;
     }
 
     @Override
@@ -91,9 +98,11 @@ public class TitleScreenButton implements Renderable, GuiEventListener, Narratab
 
     @Override
     public boolean isMouseOver(double mouseX, double mouseY) {
-        float virtualX = virtualScreen.toVirtualX((float) mouseX) - x;
-        float virtualY = virtualScreen.toVirtualY((float) mouseY) - y;
-        return virtualX >= 0 && virtualX < width && virtualY >= 0 && virtualY < height;
+        float insetX = (width - collisionW) / 2f;
+        float insetY = (height - collisionH) / 2f;
+        float virtualX = virtualScreen.toVirtualX((float) mouseX) - x - insetX;
+        float virtualY = virtualScreen.toVirtualY((float) mouseY) - y - insetY;
+        return virtualX >= 0 && virtualX < collisionW && virtualY >= 0 && virtualY < collisionH;
     }
 
     @Override
@@ -117,7 +126,10 @@ public class TitleScreenButton implements Renderable, GuiEventListener, Narratab
 
     @Override
     public ScreenRectangle getRectangle() {
-        return new ScreenRectangle((int) x, (int) y, (int) width, (int) height);
+        int insetX = (int) ((width - collisionW) / 2f);
+        int insetY = (int) ((height - collisionH) / 2f);
+        return new ScreenRectangle((int) x + insetX, (int) y + insetY,
+                (int) collisionW, (int) collisionH);
     }
 
     public boolean isHovered() {
@@ -130,6 +142,12 @@ public class TitleScreenButton implements Renderable, GuiEventListener, Narratab
 
     public void setClickSound(SoundEvent clickSound) {
         this.clickSound = clickSound;
+    }
+
+    /** 设置碰撞检测尺寸（居中于渲染矩形）。原游戏容器 < 精灵图，避免透明区域误触。 */
+    public void setCollisionSize(float w, float h) {
+        this.collisionW = w;
+        this.collisionH = h;
     }
 
     public void setAlpha(float alpha) {
