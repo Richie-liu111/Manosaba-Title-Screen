@@ -16,17 +16,45 @@
 
 ## 已知 Bug（未修复）
 
-1. **按钮全叠在一起** — 所有按钮渲染在 x=24 同一位置，点击总触发 LoadGame（[原因](ARCHIVE.md#bug-1按钮全叠在一起最高优先级)）
-2. **标题覆盖层无淡入** — TitleOverlay 立即满透明度渲染，背景被完全遮挡（[原因](ARCHIVE.md#bug-2标题覆盖层缺少淡入动画)）
-3. **Exit 对话框未写** — 空的 lambda，点击无反应（[原因](ARCHIVE.md#bug-3exit-对话框未实现)）
+### Bug 1：按钮全叠在一起（最高优先级）
 
-完整 Bug 记录见 [ARCHIVE.md](ARCHIVE.md)。
+**现象**：所有 5 个按钮渲染在屏幕左下角同一个位置（x=24），视觉上堆叠。点击任何按钮都触发第一个（LoadGame → 单人游戏选择）。
+
+**原因**：`ManosabaTitleScreen.render()` 遍历按钮时没有累加 X 坐标。原版 Fabric 代码使用 Compose `Row` 水平排列，重写时只实现了 Y 偏移（yOff），忘记实现 X 累加。
+
+**修复方法**（在新分支中已完成）：
+```kotlin
+var currentX = 24
+btns.forEachIndexed { i, b ->
+    // ... render at currentX
+    currentX += sw  // 为下一个按钮留空间
+}
+```
+同时需要更新 `mouseClicked()` 和 `mouseMoved()` 中的命中检测。
+
+### Bug 2：标题覆盖层缺少淡入动画
+
+**现象**：背景图片完全看不到。
+
+**原因**：`TitleOverlay` 是一个 2560×1440 的不透明全屏覆盖层（原版视觉小说的标题画框）。原版代码让它从透明淡入（500ms），这样背景先显示再被覆盖。当前代码一启动就全透明度渲染，背景被完全遮挡。
+
+**修复方法**（在新分支中已完成）：记录 `init()` 的时间，在 `render()` 中计算动画进度，前 1~1.5 秒只显示背景，然后 UI 元素从 alpha=0 淡入到 1。
+
+### Bug 3：Exit 对话框未实现
+
+**现象**：点击 Exit 按钮无反应（lambda 为空：`Btn("Exit", 20) { }`）。
+
+**原因**：原来 `ExitDialog.kt` 文件被删除后没有重写。需要渲染 `ui_dialog.png` 图集中的对话框精灵，并提供确认/取消交互。
+
+### Bug 4（可能）：Splash 画面 timing
+
+`LoadingOverlayMixin` 中的 `fadeOutStart == -1L` 条件取决于 Minecraft 原生字段是否初始化为 -1L。如果 Mojang 的 `LoadingOverlay.fadeOutStart` 默认初始化为 0（而非 -1），则 fade-out 不会触发，splash 画面会卡住。未经验证。
 
 ## 为何放弃此分支
 
 ### 1. 原项目本身不可用
 
-此移植基于 [Shiiyuko/Manosaba-Title-Screen](https://github.com/Shiiyuko/Manosaba-Title-Screen)（Fabric 1.21.4 + Compose Desktop）。该原项目[从未能成功运行](ARCHIVE.md#第一阶段compose-desktop失败)：
+此移植基于 [Shiiyuko/Manosaba-Title-Screen](https://github.com/Shiiyuko/Manosaba-Title-Screen)（Fabric 1.21.4 + Compose Desktop）。该原项目从未能成功运行：
 - 依赖 `androidx.compose.runtime.SnapshotStateKt`，该运行时在 Minecraft 环境中不存在
 - 项目没有 gradlew、没有 release，甚至无法自行构建
 - 非官方 fork 的 release JAR 同样因缺失 Compose 运行时类而崩溃
