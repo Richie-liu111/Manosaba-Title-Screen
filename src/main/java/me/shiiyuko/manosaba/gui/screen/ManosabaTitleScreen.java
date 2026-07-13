@@ -5,6 +5,7 @@ import me.shiiyuko.manosaba.constant.TextureConst;
 import me.shiiyuko.manosaba.gui.Layer;
 import me.shiiyuko.manosaba.gui.TitleScreenButton;
 import me.shiiyuko.manosaba.gui.VirtualScreen;
+import me.shiiyuko.manosaba.init.ManosabaSounds;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -20,6 +21,7 @@ import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.texture.Tickable;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
 import org.apache.commons.compress.utils.Lists;
 
@@ -132,6 +134,7 @@ public class ManosabaTitleScreen extends TitleScreen {
             button.setDelay(UI_DELAY);
             button.setDuration(UI_DURATION);
             button.setAlphaFunction((t, now) -> t);
+            button.setClickSound(clickSoundFor(name));
             button.setOnClick(b -> onButtonClick(name));
 
             addChild(button);
@@ -154,6 +157,12 @@ public class ManosabaTitleScreen extends TitleScreen {
                     : TextureConst.BUTTON_EXIT_NORMAL;
             default -> throw new IllegalArgumentException("Unknown button: " + name);
         };
+    }
+
+    private static SoundEvent clickSoundFor(String name) {
+        return "NewGame".equals(name)
+                ? ManosabaSounds.BUTTON_CLICK_START_GAME.get()
+                : ManosabaSounds.BUTTON_CLICK_SUBMIT.get();
     }
 
     private void onButtonClick(String name) {

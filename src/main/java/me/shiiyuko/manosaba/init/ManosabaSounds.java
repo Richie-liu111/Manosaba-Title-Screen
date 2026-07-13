@@ -16,6 +16,14 @@ public final class ManosabaSounds {
             SOUND_EVENTS.register("music", () -> SoundEvent.createVariableRangeEvent(
                     new ResourceLocation(Manosaba.MODID, "music")));
 
+    public static final RegistryObject<SoundEvent> BUTTON_CLICK_SUBMIT =
+            SOUND_EVENTS.register("button_click_submit", () -> SoundEvent.createVariableRangeEvent(
+                    new ResourceLocation(Manosaba.MODID, "button_click_submit")));
+
+    public static final RegistryObject<SoundEvent> BUTTON_CLICK_START_GAME =
+            SOUND_EVENTS.register("button_click_start_game", () -> SoundEvent.createVariableRangeEvent(
+                    new ResourceLocation(Manosaba.MODID, "button_click_start_game")));
+
     private ManosabaSounds() {
     }
 }

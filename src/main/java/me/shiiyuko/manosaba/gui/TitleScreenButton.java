@@ -11,7 +11,9 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.renderer.texture.Tickable;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
 
 import java.util.function.Consumer;
 
@@ -35,6 +37,8 @@ public class TitleScreenButton implements Renderable, GuiEventListener, Narratab
     private VirtualScreen virtualScreen;
 
     private Consumer<TitleScreenButton> onClick;
+
+    private SoundEvent clickSound;
 
     public TitleScreenButton(float x, float y, float width, float height,
                              ResourceLocation texture, ResourceLocation textureHover,
@@ -72,6 +76,10 @@ public class TitleScreenButton implements Renderable, GuiEventListener, Narratab
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (this.visible && this.isMouseOver(mouseX, mouseY)) {
+            if (this.clickSound != null) {
+                Minecraft.getInstance().getSoundManager().play(
+                        SimpleSoundInstance.forUI(this.clickSound, 1.0f, 1.0f));
+            }
             if (this.onClick != null) {
                 this.onClick.accept(this);
             }
@@ -111,6 +119,10 @@ public class TitleScreenButton implements Renderable, GuiEventListener, Narratab
 
     public void setOnClick(Consumer<TitleScreenButton> onClick) {
         this.onClick = onClick;
+    }
+
+    public void setClickSound(SoundEvent clickSound) {
+        this.clickSound = clickSound;
     }
 
     public void setAlpha(float alpha) {
