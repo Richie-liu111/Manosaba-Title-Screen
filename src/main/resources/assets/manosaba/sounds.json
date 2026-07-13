@@ -1,0 +1,10 @@
+{
+  "music": {
+    "sounds": [
+      {
+        "name": "manosaba:music",
+        "stream": true
+      }
+    ]
+  }
+}

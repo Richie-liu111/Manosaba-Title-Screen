@@ -1,0 +1,16 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "me.shiiyuko.manosaba.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "refmap": "manosaba.refmap.json",
+  "mixins": [],
+  "client": [
+    "MinecraftMixin",
+    "MusicsMixin",
+    "LoadingOverlayMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
