@@ -28,13 +28,13 @@ import org.apache.commons.compress.utils.Lists;
 import java.util.List;
 
 /**
- * Manosaba 标题画面。基于 YuZuUI 的 SenrenBankaTitleScreen 模式：
+ * Manosaba 标题画面。布局还原自原游戏（魔法少女ノ魔女裁判）TitleUI.prefab：
  * <ul>
- *   <li>设计空间 1920×1080，通过 {@link VirtualScreen} letterbox 到实际屏幕；</li>
- *   <li>背景图 ContentScale.Crop（填满屏幕，裁切溢出），1.1→1.0 缩放动画；</li>
- *   <li>TitleOverlay 全屏画框，延迟淡入；</li>
- *   <li>TitleLogo 右上角，0.65× 缩放，延迟淡入；</li>
- *   <li>5 个按钮横排于左下角，交替 Y 偏移（±20）形成 zigzag；</li>
+ *   <li>设计空间 2560×1440（原游戏 CanvasScaler ReferenceResolution）；</li>
+ *   <li>背景图 ContentScale.Crop（2:1→16:9），1.1→1.0 呼吸动画；</li>
+ *   <li>TitleOverlay 2560×1440 全屏画框 1:1 填充，延迟淡入；</li>
+ *   <li>TitleLogo 位于原 anchoredPosition=(747,381)，原生尺寸；</li>
+ *   <li>5 个按钮使用原游戏 anchoredPosition + 160px 左移（避免 Exit 被 scissor 裁剪）；</li>
  *   <li>版本号右下角；点击 Exit 直接退出游戏。</li>
  * </ul>
  * 动画由 {@link Layer#tick()} 和 {@link TitleScreenButton#tick()} 驱动，
@@ -42,11 +42,9 @@ import java.util.List;
  */
 public class ManosabaTitleScreen extends TitleScreen {
 
-    private static final VirtualScreen VIRTUAL_SCREEN = new VirtualScreen(1920, 1080);
+    private static final VirtualScreen VIRTUAL_SCREEN = new VirtualScreen(2560, 1440);
 
-    // 设计空间与纹理尺寸
-    private static final float BUTTON_SCALE = 0.6f;
-    private static final float LOGO_SCALE = 0.65f;
+    // 纹理尺寸（原游戏设计空间 2560×1440，素材以原生尺寸直接放置）
     private static final int LOGO_W = 1039;
     private static final int LOGO_H = 622;
     private static final int OVERLAY_W = 2560;
@@ -80,26 +78,28 @@ public class ManosabaTitleScreen extends TitleScreen {
     private void initLayers() {
         // 背景：1.1×→1.0× 缩放，持续 2500ms。虚拟空间填满，渲染时单独做 Crop。
         backgroundLayer = new Layer(TextureConst.BACKGROUND,
-                0, 0, 1920, 1080, 1.1f, 1f, VIRTUAL_SCREEN);
+                0, 0, 2560, 1440, 1.1f, 1f, VIRTUAL_SCREEN);
         backgroundLayer.setDelay(0L);
         backgroundLayer.setDuration(BG_DURATION);
         backgroundLayer.setScaleFunction((t, now) ->
                 1.1f + (1.0f - 1.1f) * t);
 
-        // TitleOverlay：全屏画框，延迟 2750ms 淡入 500ms。
-        // 纹理 2560×1440，拉伸到 1920×1080（FillBounds）。
+        // TitleOverlay：全屏画框，纹理 2560×1440，1:1 填充虚拟画布。
         overlayLayer = new Layer(TextureConst.TITLE_OVERLAY,
-                0, 0, 1920, 1080, 1f, 0f, VIRTUAL_SCREEN);
+                0, 0, 2560, 1440, 1f, 0f, VIRTUAL_SCREEN);
         overlayLayer.setDelay(UI_DELAY);
         overlayLayer.setDuration(UI_DURATION);
         overlayLayer.setAlphaFunction((t, now) -> t);
 
-        // TitleLogo：右上角，0.65× 缩放。
-        float logoDisplayW = LOGO_W * LOGO_SCALE;
-        float logoDisplayH = LOGO_H * LOGO_SCALE;
+        // TitleLogo：原游戏 anchoredPosition=(747, 381)，中心锚点。
+        // 父节点 Wrapper 填满画布，其中心 = (1280, 720)。
+        // Logo 绝对中心 = (1280+747, 720+381) = (2027, 1101 Y-up)。
+        // 翻转为 Y-down：(2027, 339)。纹理 1039×622。
+        float logoCenterX = 1280 + 747;
+        float logoCenterY = 1440 - (720 + 381);
         logoLayer = new Layer(TextureConst.TITLE_LOGO_JA,
-                1920 - logoDisplayW - 24, 24,
-                LOGO_W, LOGO_H, LOGO_SCALE, 0f, VIRTUAL_SCREEN);
+                logoCenterX - LOGO_W / 2f, logoCenterY - LOGO_H / 2f,
+                LOGO_W, LOGO_H, 1f, 0f, VIRTUAL_SCREEN);
         logoLayer.setDelay(UI_DELAY);
         logoLayer.setDuration(UI_DURATION);
         logoLayer.setAlphaFunction((t, now) -> t);
@@ -110,36 +110,41 @@ public class ManosabaTitleScreen extends TitleScreen {
     }
 
     private void initButtons() {
-        // 按钮横排于左下角，交替 Y 偏移（+20/-20）形成 zigzag。
-        // 原始尺寸 × BUTTON_SCALE 得到显示尺寸。
+        // 原游戏按钮层级：Wrapper → Buttons(锚在0,0，零尺寸) → 各按钮(中心锚点)。
+        // 因为 Buttons 是零尺寸点，按钮 anchoredPosition 直接就是距画布左下角的绝对坐标。
+        // 转换为 forge-1 (Y-down, 原点左上): X 不变，Y = 1440 − unityY。
         String[] names = {"LoadGame", "NewGame", "Gallery", "Options", "Exit"};
-        int[] yOffsets = {20, -20, 20, -20, 20};
+
+        // 原游戏 anchoredPosition（直接 = 按钮中心距画布左下角的偏移）
+        float[] cx = {249, 562, 836, 1086, 1299};
+        float[] cy = {174, 221, 145, 187, 129};
+        // 原游戏 Sprite 尺寸（Normal 状态）— 渲染用
         int[] widths = {498, 437, 362, 338, 277};
         int[] heights = {323, 301, 251, 230, 190};
-
-        float baseY = 1080 - 24;
-        float cursorX = 24;
+        // 原游戏按钮容器 SizeDelta — 碰撞检测用（比精灵图小，避免透明区域误触）
+        int[] colW = {290, 260, 246, 248, 164};
+        int[] colH = {230, 206, 122, 118, 106};
 
         for (int i = 0; i < names.length; i++) {
-            String name = names[i];
-            float displayW = widths[i] * BUTTON_SCALE;
-            float displayH = heights[i] * BUTTON_SCALE;
-            float y = baseY - displayH + yOffsets[i];
+            final String name = names[i];
+            // Unity Y-up (左下原点) → MC Y-down (左上原点)
+            float x = cx[i] - widths[i] / 2f;
+            float y = (1440 - cy[i]) - heights[i] / 2f;
 
             ResourceLocation normal = buttonTexture(name, false);
             ResourceLocation highlighted = buttonTexture(name, true);
             TitleScreenButton button = new TitleScreenButton(
-                    cursorX, y, displayW, displayH,
+                    x, y, widths[i], heights[i],
                     normal, highlighted, VIRTUAL_SCREEN, 0f);
             button.setDelay(UI_DELAY);
             button.setDuration(UI_DURATION);
             button.setAlphaFunction((t, now) -> t);
             button.setClickSound(clickSoundFor(name));
+            button.setCollisionSize(colW[i], colH[i]);
             button.setOnClick(b -> onButtonClick(name));
 
             addChild(button);
             addWidget(button);
-            cursorX += displayW;
         }
     }
 
@@ -242,23 +247,25 @@ public class ManosabaTitleScreen extends TitleScreen {
     }
 
     /**
-     * 背景图 ContentScale.Crop：填满 16:9 虚拟区域，按纹理原始宽高比裁切。
-     * 缩放从 1.1× 动画到 1.0×，通过采样更小的中央区域再放大实现。
+     * 背景图 ContentScale.Crop：从 2:1 纹理（4096×2048）中裁剪 16:9 区域，
+     * 填满 2560×1440 虚拟画布。缩放从 1.1×→1.0×，通过缩小 UV 采样范围实现
+     * 放大呼吸动画。
      */
     private void renderBackgroundCrop(GuiGraphics guiGraphics) {
-        float scale = backgroundLayer.getScale();
+        float zoomScale = backgroundLayer.getScale();
         float alpha = backgroundLayer.getAlpha();
 
-        // 虚拟区域 1920×1080，纹理 4096×2048（2:1），虚拟区域也是 16:9。
-        // 直接把虚拟区域映射到纹理中央的 1920×1080 对应区域。
-        // zoom > 1 时采样更小的中央区域（scale=1.1 采 1745×982）。
-        float cropVirtualW = 1920 / scale;
-        float cropVirtualH = 1080 / scale;
-        // 虚拟空间裁切区域 → 纹理空间坐标
-        float texU0 = (1920 - cropVirtualW) / 2f / 1920f;
-        float texV0 = (1080 - cropVirtualH) / 2f / 1080f;
-        float texU1 = texU0 + cropVirtualW / 1920f;
-        float texV1 = texV0 + cropVirtualH / 1080f;
+        // 背景纹理 4096×2048（2:1），目标 16:9。
+        // 基准 (zoom=1)：U 采样 88.89%（= 16/9 / 2），V 采样 100%（全高）。
+        // 放大 (zoom>1)：U 和 V 等比例缩小，保证采样区域始终是 16:9。
+        final float BASE_U = 2048f * (16f / 9f) / 4096f; // ≈0.8889
+        final float BASE_V = 1.0f;
+        float uFrac = BASE_U / zoomScale;
+        float vFrac = BASE_V / zoomScale;
+        float texU0 = (1f - uFrac) / 2f;
+        float texV0 = (1f - vFrac) / 2f;
+        float texU1 = texU0 + uFrac;
+        float texV1 = texV0 + vFrac;
 
         RenderSystem.setShaderTexture(0, TextureConst.BACKGROUND);
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
@@ -266,8 +273,8 @@ public class ManosabaTitleScreen extends TitleScreen {
 
         float px = VIRTUAL_SCREEN.toPracticalX(0);
         float py = VIRTUAL_SCREEN.toPracticalY(0);
-        float pw = VIRTUAL_SCREEN.toPracticalWidth(1920);
-        float ph = VIRTUAL_SCREEN.toPracticalHeight(1080);
+        float pw = VIRTUAL_SCREEN.toPracticalWidth(2560);
+        float ph = VIRTUAL_SCREEN.toPracticalHeight(1440);
 
         com.mojang.blaze3d.vertex.PoseStack pose = guiGraphics.pose();
         org.joml.Matrix4f matrix = pose.last().pose();
