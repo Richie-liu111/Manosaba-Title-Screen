@@ -1,0 +1,26 @@
+{
+  "music": {
+    "sounds": [
+      {
+        "name": "manosaba:music",
+        "stream": true
+      }
+    ]
+  },
+  "button_click_submit": {
+    "sounds": [
+      {
+        "name": "manosaba:button_click_submit",
+        "stream": false
+      }
+    ]
+  },
+  "button_click_start_game": {
+    "sounds": [
+      {
+        "name": "manosaba:button_click_start_game",
+        "stream": false
+      }
+    ]
+  }
+}
