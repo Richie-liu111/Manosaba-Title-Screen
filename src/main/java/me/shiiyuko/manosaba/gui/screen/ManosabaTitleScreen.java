@@ -77,7 +77,7 @@ public class ManosabaTitleScreen extends TitleScreen {
 
     private void initLayers() {
         // 背景：1.1×→1.0× 缩放，持续 2500ms。虚拟空间填满，渲染时单独做 Crop。
-        backgroundLayer = new Layer(TextureConst.BACKGROUND,
+        backgroundLayer = new Layer(TextureConst.background(),
                 0, 0, 2560, 1440, 1.1f, 1f, VIRTUAL_SCREEN);
         backgroundLayer.setDelay(0L);
         backgroundLayer.setDuration(BG_DURATION);
@@ -262,7 +262,7 @@ public class ManosabaTitleScreen extends TitleScreen {
         float texU1 = texU0 + uFrac;
         float texV1 = texV0 + vFrac;
 
-        RenderSystem.setShaderTexture(0, TextureConst.BACKGROUND);
+        RenderSystem.setShaderTexture(0, TextureConst.background());
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, alpha);
 
