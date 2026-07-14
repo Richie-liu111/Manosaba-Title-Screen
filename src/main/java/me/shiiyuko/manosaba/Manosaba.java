@@ -1,6 +1,8 @@
 package me.shiiyuko.manosaba;
 
 import com.mojang.logging.LogUtils;
+import me.shiiyuko.manosaba.config.ManosabaConfig;
+import me.shiiyuko.manosaba.config.ManosabaConfigScreen;
 import me.shiiyuko.manosaba.init.ManosabaSounds;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
@@ -17,11 +19,13 @@ public class Manosaba {
     public static final Logger LOGGER = LogUtils.getLogger();
 
     public Manosaba() {
+        ManosabaConfig.register();
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         ManosabaSounds.SOUND_EVENTS.register(modEventBus);
         MinecraftForge.EVENT_BUS.register(this);
 
         if (FMLEnvironment.dist == Dist.CLIENT) {
+            MinecraftForge.registerConfigScreen(ManosabaConfigScreen::new);
             LOGGER.info("Manosaba title screen loaded (Forge 1.20.1).");
         }
     }

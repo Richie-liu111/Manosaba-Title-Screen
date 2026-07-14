@@ -1,5 +1,13 @@
 # Changelog
 
+## v1.0.3 — 2026-07-14
+
+### 背景角色切换 + 模组图标 + 配置界面
+
+- **背景角色配置**：新增 `background_ema.png`（艾玛），通过 `config/manosaba-client.toml` 中 `backgroundCharacter` 项在希罗/艾玛间切换，无需重新编译
+- **模组图标**：添加 `icon.png`（来自原游戏 PlayerIcon.icns），Mods 列表显示
+- **配置界面**：新增 `MinecraftForge.registerConfigScreen()` / `container.registerExtensionPoint()`，Mods 列表「配置」按钮可用，提供游戏内一键切换背景角色的 GUI
+
 ## v1.0.2 — 2026-07-13
 
 ### 布局完全还原
