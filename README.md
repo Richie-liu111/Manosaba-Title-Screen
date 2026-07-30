@@ -19,13 +19,7 @@
 # 输出：build/libs/manosaba-*.jar
 ```
 
-`./gradlew runClient` 启动的是**裸 Forge 1.7.10**（非完整 GTNH 整合包）。模组在裸 Forge 下正常工作，但音效系统可能不稳定（LWJGL 2 ARM64 OpenAL 兼容性问题）。推荐测试方式：
-
-```bash
-./gradlew build  # 构建 JAR
-# 将 build/libs/manosaba-*.jar 放入 HMCL 的 GTNH 实例 mods/ 文件夹
-# 启动 GTNH 整合包测试
-```
+`./gradlew runClient` 启动的是**裸 Forge 1.7.10**（非完整 GTNH 整合包）。可能不稳定（LWJGL 2 ARM64 OpenAL 兼容性问题）。
 
 ## 功能
 
