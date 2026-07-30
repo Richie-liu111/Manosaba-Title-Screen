@@ -6,7 +6,7 @@
 
 ## 功能
 
-- **自定义启动画面**：替换原版 Mojang 红白加载条，显示 BrandLogo 与 CompanyLogo
+- **自定义~~启动~~（资源包加载）画面**：替换原版 Mojang 红白加载条，显示 BrandLogo 与 CompanyLogo
 - **自定义标题画面**：
   - 背景图 ContentScale.Crop + 1.1×→1.0× 缩放动画
   - TitleOverlay 全屏画框淡入
