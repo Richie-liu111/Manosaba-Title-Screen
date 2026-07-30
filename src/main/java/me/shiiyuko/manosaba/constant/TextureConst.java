@@ -42,6 +42,13 @@ public final class TextureConst {
     public static final ResourceLocation BUTTON_WITCH_BOOK_NORMAL = ui("button_witchbook_normal");
     public static final ResourceLocation BUTTON_WITCH_BOOK_HIGHLIGHTED = ui("button_witchbook_highlighted");
 
+    // 按钮悬停中文标签（原游戏 Label@ZhHans 精灵）
+    public static final ResourceLocation LABEL_LOAD_GAME = ui("label_loadgame_zhhans");
+    public static final ResourceLocation LABEL_NEW_GAME = ui("label_newgame_zhhans");
+    public static final ResourceLocation LABEL_GALLERY = ui("label_gallery_zhhans");
+    public static final ResourceLocation LABEL_OPTIONS = ui("label_options_zhhans");
+    public static final ResourceLocation LABEL_EXIT = ui("label_exit_zhhans");
+
     public static final ResourceLocation BRAND_LOGO = ui("brandlogo_acacia");
     public static final ResourceLocation COMPANY_LOGO = ui("companylogo_reaer");
 }

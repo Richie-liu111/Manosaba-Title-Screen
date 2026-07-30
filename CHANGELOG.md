@@ -1,5 +1,40 @@
 # Changelog
 
+## v1.0.4 — 2026-07-29
+
+### Mixin 兼容性加固
+
+基于 YuZuUI 上游 PR（link-fgfgui#1）的分析和修复，增强标题画面替换的健壮性。
+
+#### `MinecraftMixin`：双重拦截 `TitleScreen`
+
+- 在现有 `@ModifyVariable`（拦截参数）之上新增 `@Redirect`，拦截 `setScreen()` 调用栈内所有 `new TitleScreen()` 构造
+- 修复潜在 bug：读取存档→无存档→进入创建世界→按 ESC 返回→回到原版 TitleScreen
+- 原 `@ModifyVariable(argsOnly = true)` 只能拦截显式传参，某些代码路径下 TitleScreen 实例不经过参数传递而漏网
+
+> **注**：NeoForge 版的 `MusicsMixin` 在 v1.0.3 已经使用 `@Redirect`，本次无需更改。
+
+### 按钮悬停中文标签 + 语言自适应 Logo（2026-07-30）
+
+基于原游戏 AssetRipper 解包的 TitleUI.prefab 完整分析，还原按钮悬停中文标签和语言自适应 Logo。
+
+#### 按钮悬停中文标签
+
+- **`TitleScreenButton` 新增 `setLabelTexture()`**：悬停时在按钮上方叠加独立的中文标签精灵（原游戏 `Label@ZhHans`）
+- **位置精确还原**：从 TitleUI.prefab 提取 Normal 容器偏移 + Highlighted 容器偏移 + Label@ZhHans anchoredPosition，三次联立换算为按钮相对坐标
+- **修复按钮精灵位置**：原代码假设精灵从按钮根节点中心展开，实际 Unity 中 Normal 子容器有独立 anchoredPosition 偏移（2-11px），已修正按钮初始坐标
+- **仅简中显示**：检查 `Minecraft.options.languageCode`，zh* 前缀时显示标签
+
+#### Logo 语言切换
+
+- **动态 Logo 选择**：简中时显示中文 Logo（`titlelogo_zhhans.png`），其余语言显示日文 Logo
+- **屏幕复用修复**：切语言后标题画面实例被复用，改为在 `render()` 中动态更新纹理
+
+#### 标签素材
+
+- 复用图集拆分阶段导出的 `label_*_zhhans.png`（5 个按钮 + 预留 WitchBook）
+- 中文 Logo 素材：`titlelogo_zhhans.png`（已随 v1.0.2 导入）
+
 ## v1.0.3 — 2026-07-14
 
 ### 背景角色切换 + 模组图标 + 配置界面
