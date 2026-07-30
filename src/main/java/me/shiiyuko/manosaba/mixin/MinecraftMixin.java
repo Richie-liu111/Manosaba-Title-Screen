@@ -7,14 +7,19 @@ import net.minecraft.client.gui.screens.TitleScreen;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
+import org.spongepowered.asm.mixin.injection.Redirect;
 
 /**
  * Replaces any vanilla {@link TitleScreen} the game tries to display with the
- * custom Manosaba title screen. Using {@code @ModifyVariable} on
- * {@link Minecraft#setScreen(Screen)} (rather than injecting into
- * {@code TitleScreen.init}) avoids a re-entrancy loop: the replacement is a
- * subclass of {@code TitleScreen}, so a plain {@code instanceof TitleScreen}
- * guard would fire forever.
+ * custom Manosaba title screen.
+ * <p>
+ * Two-pronged approach:
+ * <ol>
+ *   <li>{@code @ModifyVariable} — 拦截传给 setScreen 的 TitleScreen 参数；</li>
+ *   <li>{@code @Redirect} — 兜底拦截 setScreen 调用栈内所有
+ *       {@code new TitleScreen()}，防止某些代码路径（如读取存档→无存档→
+ *       创建世界→返回）的 TitleScreen 实例不经过参数传递而漏网。</li>
+ * </ol>
  */
 @Mixin(Minecraft.class)
 public abstract class MinecraftMixin {
@@ -25,5 +30,11 @@ public abstract class MinecraftMixin {
             return new ManosabaTitleScreen();
         }
         return screen;
+    }
+
+    @Redirect(method = "setScreen",
+            at = @At(value = "NEW", target = "net/minecraft/client/gui/screens/TitleScreen"))
+    private TitleScreen manosaba$redirectTitleScreen() {
+        return new ManosabaTitleScreen();
     }
 }

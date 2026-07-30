@@ -97,7 +97,9 @@ public class ManosabaTitleScreen extends TitleScreen {
         // 翻转为 Y-down：(2027, 339)。纹理 1039×622。
         float logoCenterX = 1280 + 747;
         float logoCenterY = 1440 - (720 + 381);
-        logoLayer = new Layer(TextureConst.TITLE_LOGO_JA,
+        ResourceLocation logoTex = isChineseLocale()
+                ? TextureConst.TITLE_LOGO_ZH : TextureConst.TITLE_LOGO_JA;
+        logoLayer = new Layer(logoTex,
                 logoCenterX - LOGO_W / 2f, logoCenterY - LOGO_H / 2f,
                 LOGO_W, LOGO_H, 1f, 0f, VIRTUAL_SCREEN);
         logoLayer.setDelay(UI_DELAY);
@@ -121,15 +123,26 @@ public class ManosabaTitleScreen extends TitleScreen {
         // 原游戏 Sprite 尺寸（Normal 状态）— 渲染用
         int[] widths = {498, 437, 362, 338, 277};
         int[] heights = {323, 301, 251, 230, 190};
+        // Normal 容器相对于按钮根节点的偏移（Unity → MC Y-down 翻转）
+        // 按钮精灵并非从根节点中心画起，而是从 Normal 子容器的偏移处开始
+        float[] normalOx = {0, -10, -8, -10, -11};
+        float[] normalOy = {4, 8, 8, 2, -7};
         // 原游戏按钮容器 SizeDelta — 碰撞检测用（比精灵图小，避免透明区域误触）
         int[] colW = {290, 260, 246, 248, 164};
         int[] colH = {230, 206, 122, 118, 106};
+        // 中文标签精灵尺寸 + 相对于按钮精灵左上角的精确偏移（TitleUI.prefab RectTransform 换算）
+        int[] labelW = {149, 111, 60, 125, 59};
+        int[] labelH = {35, 34, 30, 29, 28};
+        float[] labelOx = {216.5f, 191f, 168f, 120.5f, 120f};
+        float[] labelOy = {243f, 217.5f, 150.5f, 152.5f, 135f};
 
         for (int i = 0; i < names.length; i++) {
             final String name = names[i];
             // Unity Y-up (左下原点) → MC Y-down (左上原点)
-            float x = cx[i] - widths[i] / 2f;
-            float y = (1440 - cy[i]) - heights[i] / 2f;
+            // 加上 Normal 容器偏移：按钮精灵从 Normal 子容器渲染，其 anchoredPosition
+            // 决定了精灵相对于按钮根节点中心的实际起始位置
+            float x = cx[i] - widths[i] / 2f + normalOx[i];
+            float y = (1440 - cy[i]) - heights[i] / 2f + normalOy[i];
 
             ResourceLocation normal = buttonTexture(name, false);
             ResourceLocation highlighted = buttonTexture(name, true);
@@ -141,6 +154,7 @@ public class ManosabaTitleScreen extends TitleScreen {
             button.setAlphaFunction((t, now) -> t);
             button.setClickSound(clickSoundFor(name));
             button.setCollisionSize(colW[i], colH[i]);
+            button.setLabelTexture(labelTexture(name), labelW[i], labelH[i], labelOx[i], labelOy[i]);
             button.setOnClick(b -> onButtonClick(name));
 
             addChild(button);
@@ -161,6 +175,22 @@ public class ManosabaTitleScreen extends TitleScreen {
             case "Exit" -> highlighted ? TextureConst.BUTTON_EXIT_HIGHLIGHTED
                     : TextureConst.BUTTON_EXIT_NORMAL;
             default -> throw new IllegalArgumentException("Unknown button: " + name);
+        };
+    }
+
+    private static boolean isChineseLocale() {
+        String code = Minecraft.getInstance().options.languageCode;
+        return code != null && code.startsWith("zh");
+    }
+
+    private static ResourceLocation labelTexture(String name) {
+        return switch (name) {
+            case "LoadGame" -> TextureConst.LABEL_LOAD_GAME;
+            case "NewGame" -> TextureConst.LABEL_NEW_GAME;
+            case "Gallery" -> TextureConst.LABEL_GALLERY;
+            case "Options" -> TextureConst.LABEL_OPTIONS;
+            case "Exit" -> TextureConst.LABEL_EXIT;
+            default -> null;
         };
     }
 
@@ -212,6 +242,10 @@ public class ManosabaTitleScreen extends TitleScreen {
         VIRTUAL_SCREEN.setPracticalHeight(currentHeight);
         VIRTUAL_SCREEN.setCurrentX(currentX);
         VIRTUAL_SCREEN.setCurrentY(currentY);
+
+        // Logo 随语言切换动态更新（屏幕实例可能被复用，不在构造时锁定）
+        logoLayer.setTexture(isChineseLocale()
+                ? TextureConst.TITLE_LOGO_ZH : TextureConst.TITLE_LOGO_JA);
 
         // 背景：先填黑，再在 16:9 区域内做 ContentScale.Crop 渲染。
         guiGraphics.fill(0, 0, screenWidth, screenHeight, 0xFF000000);

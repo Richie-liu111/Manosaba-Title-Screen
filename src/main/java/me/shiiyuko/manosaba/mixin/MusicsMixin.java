@@ -1,33 +1,36 @@
 package me.shiiyuko.manosaba.mixin;
 
 import me.shiiyuko.manosaba.init.ManosabaSounds;
+import net.minecraft.core.Holder;
 import net.minecraft.sounds.Music;
 import net.minecraft.sounds.Musics;
-import org.spongepowered.asm.mixin.Final;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Mutable;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.Redirect;
 
 /**
- * Replaces the vanilla menu music ({@link Musics#MENU}) with the Manosaba
- * title track. The music manager then handles playback and looping natively,
- * so no manual sound scheduling is required.
+ * 替换菜单音乐为 Manosaba 标题曲。
+ * 用 @Redirect 拦截 Musics.&lt;clinit&gt; 中的 new Music(...) 构造，
+ * 当目标是 MUSIC_MENU 时替换为自定义音乐。
+ * <p>
+ * 相比 @Shadow+@Final+@Mutable+@Inject 的旧方案，@Redirect
+ * 不需要绕过 static final 限制，跨版本/跨加载器兼容性更好。
  */
 @Mixin(Musics.class)
 public abstract class MusicsMixin {
 
-    @Mutable
-    @Shadow
-    @Final
-    public static Music MENU;
-
-    @Inject(method = "<clinit>", at = @At("TAIL"))
-    private static void manosaba$replaceMenuMusic(CallbackInfo ci) {
-        MENU = new Music(
-                ManosabaSounds.TITLE_MUSIC.getHolder().orElseThrow(),
-                50, 50, true);
+    @Redirect(method = "<clinit>", at = @At(value = "NEW",
+            target = "(Lnet/minecraft/core/Holder;IIZ)Lnet/minecraft/sounds/Music;"))
+    private static Music manosaba$redirectMenuMusic(Holder<SoundEvent> eventHolder,
+                                                     int minDelay, int maxDelay,
+                                                     boolean replaceCurrentMusic) {
+        if (eventHolder.value() == SoundEvents.MUSIC_MENU.value()) {
+            return new Music(
+                    ManosabaSounds.TITLE_MUSIC.getHolder().orElseThrow(),
+                    50, 50, true);
+        }
+        return new Music(eventHolder, minDelay, maxDelay, replaceCurrentMusic);
     }
 }

@@ -39,6 +39,11 @@ public class TitleScreenButton implements Renderable, GuiEventListener, Narratab
 
     private ResourceLocation texture;
     private ResourceLocation textureHover;
+    private ResourceLocation labelTexture;
+    private float labelWidth;
+    private float labelHeight;
+    private float labelOffsetX;
+    private float labelOffsetY;
     private VirtualScreen virtualScreen;
 
     private Consumer<TitleScreenButton> onClick;
@@ -77,6 +82,19 @@ public class TitleScreenButton implements Renderable, GuiEventListener, Narratab
                     virtualScreen.toPracticalHeight(height),
                     guiGraphics.pose()
             );
+            // 悬停时叠加中文标签（原游戏 Label@ZhHans 精灵，仅简中语言时显示）
+            if (this.isHovered && this.labelTexture != null
+                    && Minecraft.getInstance().options.languageCode != null
+                    && Minecraft.getInstance().options.languageCode.startsWith("zh")) {
+                RenderSystem.setShaderTexture(0, labelTexture);
+                RenderUtils.blit(
+                        virtualScreen.toPracticalX(x + labelOffsetX),
+                        virtualScreen.toPracticalY(y + labelOffsetY),
+                        virtualScreen.toPracticalWidth(labelWidth),
+                        virtualScreen.toPracticalHeight(labelHeight),
+                        guiGraphics.pose()
+                );
+            }
         }
     }
 
@@ -139,6 +157,17 @@ public class TitleScreenButton implements Renderable, GuiEventListener, Narratab
     public void setCollisionSize(float w, float h) {
         this.collisionW = w;
         this.collisionH = h;
+    }
+
+    /** 设置悬停时显示的中文标签精灵（原游戏 Label@ZhHans）。
+     *  @param offsetX 标签左上角相对于按钮左上角的 X 偏移
+     *  @param offsetY 标签左上角相对于按钮左上角的 Y 偏移 */
+    public void setLabelTexture(ResourceLocation texture, float w, float h, float offsetX, float offsetY) {
+        this.labelTexture = texture;
+        this.labelWidth = w;
+        this.labelHeight = h;
+        this.labelOffsetX = offsetX;
+        this.labelOffsetY = offsetY;
     }
 
     public void setAlpha(float alpha) {
