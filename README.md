@@ -6,12 +6,11 @@
 
 ## 功能
 
-- **2560×1440 虚拟画布**：基于原游戏 CanvasScaler ReferenceResolution，所有 UI 元素使用原游戏精确坐标
-- **背景 ContentScale.Crop**：2:1（4096×2048）纹理裁切为 16:9，1.1× → 1.0× 呼吸缩放动画
-- **TitleOverlay + TitleLogo**：画框延迟淡入，Logo 随语言自适应（简中 = 中文 Logo，其余 = 日文）
-- **5 个按钮**：原游戏 anchoredPosition 精确还原（2560×1440 设计空间内），Hover 高亮 + 中文标签叠加
+- **2560×1440 虚拟画布**：基于原游戏 CanvasScaler ReferenceResolution，所有 UI 元素使用原游戏坐标
+- **背景 ContentScale.Crop**：2:1（4096×2048）纹理裁切为 16:9，1.1× → 1.0× 缩放动画
+- **TitleOverlay + TitleLogo**：画框延迟淡入，Logo 随语言改变（简中 = 中文 Logo，其余 = 日文）
+- **5 个按钮**：原游戏 anchoredPosition 还原（2560×1440 设计空间内），Hover 高亮 + 中文标签叠加
 - **按钮中文标签**：悬停时显示原游戏 Label@ZhHans 精灵（仅简中语言环境）
-- **背景角色切换**：希罗 (HIRO) / 艾玛 (EMA)，通过 Mod Options 配置界面切换
 - **自定义背景音乐**：替换原版标题音乐，使用 Mixin 拦截 MusicTicker
 
 ## 按钮功能映射
@@ -89,16 +88,6 @@ assets/                 → 资源文件（纹理, 音效, JSON）
 
 全局 `animationStartTime` 时钟控制所有元素动画。`resize` 不重置时钟，`ESC` 返回子界面不重置，仅新实例（游戏退出回标题）重置。
 
-## 配置
-
-通过游戏内 Mod List → Manosaba → Config 按钮打开配置界面，切换背景角色：
-
-| 选项 | 说明 | 默认值 |
-|---|---|---|
-| 背景角色 | 希罗 (HIRO) / 艾玛 (EMA) | HIRO |
-
-配置文件路径：`.minecraft/config/manosaba.cfg`
-
 ## 架构差异（vs Forge 1.20.1）
 
 | | 1.12.2 Forge | 1.20.1 Forge |
@@ -121,7 +110,7 @@ assets/                 → 资源文件（纹理, 音效, JSON）
 - [YuZuUI-Vintage](https://github.com/RuiXuqi/YuZuUI-Vintage) by RuiXuqi — 架构参考
 - [YuZuUI-Forge](https://github.com/ming-sc/YuZuUI-Forge) by IMG — 原始 YuZuUI
 - [YuZuUI-GTNH](https://github.com/paulzzh/YuZuUI-GTNH) by Paulzzh — GTNH 移植参考
-- 原始游戏：《魔法少女ノ魔女裁判》
+- 原游戏：《魔法少女ノ魔女裁判》
 
 ## 许可证
 
