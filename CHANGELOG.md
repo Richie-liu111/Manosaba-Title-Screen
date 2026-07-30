@@ -52,12 +52,11 @@
 
 #### 音效
 
-- **自定义标题曲**：原游戏 BGM，`PositionedSoundRecord.func_147674_a` 流式播放
-- **按钮点击音效**：新游戏/提交两种音效
+- **自定义标题曲**：《gDie Divil JIO》
 - **音乐生命周期**：标题画面播放 → 子画面（GuiOptions 等）切换不中断 → 离开标题画面体系时停止
 - **GTNH 兼容**：在完整 GTNH 整合包中由 GTNH 音乐系统接管
 
 #### 已知限制
 
-- **LWJGL 2 ARM64**：`runClient` 裸 Forge 下音效系统可能不稳定（OpenAL native 兼容性），完整 GTNH 整合包无此问题
+- **LWJGL 2 ARM64**：`runClient` 裸 Forge 下可能不稳定（OpenAL native 兼容性）
 - **JDK 要求**：构建需 JDK 17+（推荐 21）；GTNH Convention Plugin 通过 Jabel 编译现代语法到 JVM 8 字节码
