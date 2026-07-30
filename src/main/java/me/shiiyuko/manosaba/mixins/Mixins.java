@@ -14,7 +14,9 @@ public enum Mixins {
     MINECRAFT(new Builder("GUI").addTargetedMod(TargetedMod.VANILLA).setSide(Side.CLIENT)
         .setPhase(Phase.EARLY).addMixinClasses("minecraft.MinecraftMixin")),
     MUSIC_VANILLA(new Builder("MUSIC").addTargetedMod(TargetedMod.VANILLA).setSide(Side.CLIENT)
-        .setPhase(Phase.EARLY).addMixinClasses("minecraft.MusicTickerMixin"));
+        .setPhase(Phase.EARLY).addMixinClasses("minecraft.MusicTickerMixin")),
+    MUSIC_GALACTICRAFT(new Builder("MUSIC_GALACTICRAFT").addTargetedMod(TargetedMod.GALACTICRAFT).setSide(Side.CLIENT)
+        .setPhase(Phase.LATE).addMixinClasses("galacticraft.MusicTickerGCMixin"));
 
     private final List<String> mixinClasses;
     private final Supplier<Boolean> applyIf;

@@ -6,7 +6,8 @@ import cpw.mods.fml.common.Mod;
  * 条件 Mixin 加载的目标 Mod 定义。
  */
 public enum TargetedMod {
-    VANILLA("Minecraft", null);
+    VANILLA("Minecraft", null),
+    GALACTICRAFT("GalacticraftCore", null, "GalacticraftCore");
 
     /** "name" in the {@link Mod @Mod} annotation */
     public final String modName;

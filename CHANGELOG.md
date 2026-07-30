@@ -54,7 +54,26 @@
 
 - **自定义标题曲**：《gDie Divil JIO》
 - **音乐生命周期**：标题画面播放 → 子画面（GuiOptions 等）切换不中断 → 离开标题画面体系时停止
-- **GTNH 兼容**：在完整 GTNH 整合包中由 GTNH 音乐系统接管
+- **Vanilla MusicTicker 拦截**（EARLY phase）：`MusicTickerMixin` 无条件 `ci.cancel()`，仿 YuZuUI 不检查 `currentScreen`
+- **Galacticraft MusicTickerGC 拦截**（LATE phase）：`MusicTickerGCMixin` 条件加载，针对 GTNH 2.8.4 中 Galacticraft 替换的 `MusicTickerGC`
+- **LATE Mixin 加载**：`ManosabaMixins` 实现 `ILateMixinLoader` + `@LateMixin`，GTNHMixins 自动发现
+- **音乐退出清理**：Exit 时先停音乐再设 `exit` 标记，避免音乐残留到原版菜单
+
+#### 配置
+
+- **GTNHLib @Config**：`useEmaBackground`（布尔复选框）、`bgm`、`justExit`
+- **mcmod.info**：`modListVersion: 2` 格式，完整的作者致谢和 YuZuUI-GTNH 引用
+
+#### 修复记录
+
+- **背景缩放不动**：`backgroundLayer` 未 tick
+- **Exit 循环**：`displayGuiScreen(null)` → `GuiMainMenu` → Mixin 再拦截
+- **动画每次重置**：`initGui()` 每次重新初始化
+- **按钮打断音乐**：`onGuiClosed()` 在切子画面时停音乐
+- **GTNH 音乐不拦截**：Galacticraft 替换 `MusicTicker` 为 `MusicTickerGC`，需单独 Mixin
+- **版本号截断**：坐标计算修正
+- **mod options 花屏**：缺少 `mcmod.info`
+- **Mod 图标**：`icon.png` 资源
 
 #### 已知限制
 

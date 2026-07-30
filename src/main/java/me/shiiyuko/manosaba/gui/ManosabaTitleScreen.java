@@ -45,14 +45,13 @@ public class ManosabaTitleScreen extends GuiScreen {
 
     /** 退出标记：设为 true 后 MinecraftMixin 不再拦截 GuiMainMenu。 */
     public static boolean exit = false;
+    // 背景音乐
+    private static final ResourceLocation MANOSABA_MUSIC = new ResourceLocation("manosaba", "music");
+    private static PositionedSoundRecord currentMusic = null;
+    private static long soundStartTime = 0;
+    private static final long MUSIC_DELAY = 1500L;
     /** 进世界标记：从世界返回标题画面时触发动画重播。 */
     public static boolean inGamed = false;
-
-    // 背景音乐（MusicTickerMixin 需访问 currentMusic / soundStartTime 以停止音乐）
-    private static final ResourceLocation MANOSABA_MUSIC = new ResourceLocation("manosaba", "music");
-    public static PositionedSoundRecord currentMusic = null;
-    public static long soundStartTime = 0;
-    private static final long MUSIC_DELAY = 1500L;
 
     // 点击音效
     private static final ResourceLocation SOUND_CLICK = new ResourceLocation("manosaba", "button_click_submit");
@@ -160,15 +159,16 @@ public class ManosabaTitleScreen extends GuiScreen {
             case "Exit":
                 // 参考 YuZuUI：设置 exit 标记让 Mixin 不再拦截，
                 // 然后 displayGuiScreen(null) 触发原版 GuiMainMenu
+                // 停止音乐后再退出
+                if (currentMusic != null && mc.getSoundHandler() != null) {
+                    mc.getSoundHandler().stopSound(currentMusic);
+                    currentMusic = null;
+                    soundStartTime = 0;
+                }
                 exit = true;
                 if (ManosabaConfig.justExit) {
                     mc.shutdown();
                 } else {
-                    // 停止 manosaba 音乐，回到原版主菜单
-                    if (currentMusic != null) {
-                        mc.getSoundHandler().stopSound(currentMusic);
-                        currentMusic = null;
-                    }
                     mc.displayGuiScreen(null);
                 }
                 break;
@@ -177,26 +177,18 @@ public class ManosabaTitleScreen extends GuiScreen {
 
     @Override
     public void updateScreen() {
-        // 背景层的 tick（不在 layers 循环中渲染，需单独 tick 驱动缩放动画）
         backgroundLayer.tick();
         for (TitleScreenButton btn : buttons) btn.tick();
         tickMusic();
     }
 
-    /**
-     * 背景音乐循环播放。在标题画面时，如果开启了 BGM 且当前没有音乐在播放，
-     * 延迟 MUSIC_DELAY 后播放 manosaba 标题曲。
-     */
     private void tickMusic() {
         if (!ManosabaConfig.bgm) return;
         Minecraft mc = Minecraft.getMinecraft();
         if (mc.getSoundHandler() == null) return;
-
         if (currentMusic == null || !mc.getSoundHandler().isSoundPlaying(currentMusic)) {
             long now = System.currentTimeMillis();
-            if (soundStartTime == 0) {
-                soundStartTime = now;
-            }
+            if (soundStartTime == 0) soundStartTime = now;
             if (now - soundStartTime > MUSIC_DELAY) {
                 currentMusic = PositionedSoundRecord.func_147674_a(MANOSABA_MUSIC, 1.0F);
                 mc.getSoundHandler().playSound(currentMusic);

@@ -57,7 +57,6 @@
 ## 致谢
 
 - 原始 Fabric 模组：[Shiiyuko](https://github.com/Shiiyuko)
-- Forge / NeoForge / GTNH 移植：[Richie](https://github.com/Richie-liu111)
 - GTNH 1.7.10 构建基于 [YuZuUI-GTNH](https://github.com/paulzzh/YuZuUI-GTNH) by Paulzzh
 - YuZuUI 参考：[ming-sc](https://github.com/ming-sc/YuZuUI-Forge)
 - 原始游戏素材：《魔法少女ノ魔女裁判》
