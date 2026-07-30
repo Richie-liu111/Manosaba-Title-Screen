@@ -1,0 +1,89 @@
+plugins {
+    id 'java'
+    id 'java-library'
+    id 'maven-publish'
+    id 'com.gtnewhorizons.retrofuturagradle' version '2.0.2'
+}
+
+version = project.property('mod_version')
+group = project.property('root_package')
+base {
+    archivesName = project.property('mod_id')
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(8)
+    }
+    withSourcesJar()
+}
+
+minecraft {
+    mcVersion.set('1.12.2')
+    mcpMappingChannel.set(project.property('mapping_channel'))
+    mcpMappingVersion.set(project.property('mapping_version'))
+    username.set('Dev')
+    extraRunJvmArguments.add('-ea:' + group)
+    extraRunJvmArguments.add('-Dmixin.hotSwap=true')
+    extraRunJvmArguments.add('-Dmixin.checks.interfaces=true')
+    extraRunJvmArguments.add('-Dmixin.debug.export=true')
+}
+
+repositories {
+    maven {
+        name 'CleanroomMC Maven'
+        url 'https://maven.cleanroommc.com'
+    }
+}
+
+dependencies {
+    // Modern Java syntax support (Jabel)
+    annotationProcessor 'com.github.bsideup.jabel:jabel-javac-plugin:1.0.0'
+    annotationProcessor 'net.java.dev.jna:jna-platform:5.13.0'
+    compileOnly('com.github.bsideup.jabel:jabel-javac-plugin:1.0.0') {
+        transitive = false
+    }
+    patchedMinecraft 'me.eigenraven.java8unsupported:java-8-unsupported-shim:1.0.0'
+
+    // MixinBooter
+    String mixin = modUtils.enableMixins("zone.rong:mixinbooter:10.6", "mixins.manosaba.refmap.json")
+    api(mixin) { transitive = false }
+    annotationProcessor 'org.ow2.asm:asm-debug-all:5.2'
+    annotationProcessor 'com.google.guava:guava:32.1.2-jre'
+    annotationProcessor 'com.google.code.gson:gson:2.8.9'
+    annotationProcessor(mixin) { transitive = false }
+
+    // Mac ARM support
+    runtimeOnly 'com.cleanroommc:osxnarratorblocker:1.0'
+}
+
+processResources {
+    inputs.property 'mod_id', project.property('mod_id')
+    inputs.property 'mod_name', project.property('mod_name')
+    inputs.property 'mod_version', project.property('mod_version')
+
+    filesMatching('mcmod.info') { fcd ->
+        fcd.expand(
+                'mod_id': project.property('mod_id'),
+                'mod_name': project.property('mod_name'),
+                'mod_version': project.property('mod_version'),
+        )
+    }
+}
+
+jar {
+    manifest {
+        attributes 'FMLCorePlugin': 'com.paulzzh.yuzu.ManosabaCore'
+        attributes 'FMLCorePluginContainsFMLMod': true
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    sourceCompatibility = 17
+    options.release.set(8)
+    javaCompiler.set(javaToolchains.compilerFor {
+        languageVersion.set(JavaLanguageVersion.of(16))
+        vendor.set(JvmVendorSpec.AZUL)
+    })
+}

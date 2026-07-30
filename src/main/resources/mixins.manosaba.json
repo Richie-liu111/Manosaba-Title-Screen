@@ -1,0 +1,11 @@
+{
+    "package": "com.paulzzh.yuzu.mixins",
+    "required": true,
+    "refmap": "mixins.manosaba.refmap.json",
+    "target": "@env(DEFAULT)",
+    "minVersion": "0.8.5",
+    "compatibilityLevel": "JAVA_8",
+    "mixins": [],
+    "server": [],
+    "client": ["MinecraftMixin"]
+}
