@@ -81,7 +81,7 @@ assets/                 → 资源文件（纹理, 音效, JSON）
 ### 音乐
 
 - Mixin：`@Redirect` 拦截 `Minecraft.runTick()` → `MusicTicker.update()` 调用处（参考 YuZuUI-Vintage 写法）
-- 当 `currentScreen instanceof ManosabaTitleScreen` 时跳过 `MusicTicker.update()`，防止原版 BGM 播放
+- inGame：`!inGame` 时全菜单界面（含 Options/世界选择等）拦截 MusicTicker，防止原版音乐在子界面响起；`MusicTickerAccessor` 清理残留声音
 - 自定义 BGM 由 `ManosabaTitleScreen.updateScreen()` 管理：延迟约 1.2s 启动，子界面切换时不中断
 
 ### 动画
@@ -103,6 +103,7 @@ assets/                 → 资源文件（纹理, 音效, JSON）
 | 配置系统 | `Configuration`（旧版 Forge API） | `ForgeConfigSpec` |
 | 声音注册 | `ForgeRegistries.SOUND_EVENTS.register()` | `DeferredRegister<SoundEvent>` |
 | 字体渲染 | `fontRenderer.drawString()` | `guiGraphics.drawString()` |
+| 音乐抑制 | `inGame` 守卫 + MusicTickerAccessor（全菜单界面拦截） | `@Redirect` <clinit> 劫持 `Musics.MENU` |
 
 ## 致谢
 

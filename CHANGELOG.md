@@ -31,6 +31,8 @@
 - 无 `DeferredRegister` → 使用 `ForgeRegistries.SOUND_EVENTS.register()` 直接注册
 - Mixin 目标从 `Musics.<clinit>`（1.20.1 的静态初始化劫持）改为 `Minecraft.runTick()` → `MusicTicker.update()` 的 `@Redirect`（拦截调用处）
 - BGM 由 `ManosabaTitleScreen.updateScreen()` 自行管理，不依赖 `MusicTicker` 播放
+- **`inGame` 守卫模式**：当 `!Manosaba.inGame`（菜单界面），跳过 `MusicTicker.update()` 并停掉残留声音。`inGame` 在标题画面显示时设为 `false`，进入世界/服务器时设为 `true` → 无论 Options/世界选择等任何子界面，原版 MusicTicker 都不会响起
+- `MusicTickerAccessor`（`@Accessor` mixin）访问 `MusicTicker.currentMusic`，返回标题界面时清理残留音乐
 
 **动画系统**
 - 全局 `animationStartTime` 时钟（static），非 per-instance startTime
