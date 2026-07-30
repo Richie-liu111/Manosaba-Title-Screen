@@ -21,6 +21,8 @@ public class Manosaba {
     public static final String VERSION = "1.0.4";
 
     public static Logger LOGGER;
+    /** 玩家是否在游戏世界中（非菜单界面）。Mixin 靠此判断是否拦截 MusicTicker */
+    public static boolean inGame = false;
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
