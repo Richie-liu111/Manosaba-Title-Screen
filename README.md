@@ -63,7 +63,7 @@ btns.forEachIndexed { i, b ->
 
 ### 2. 架构重写
 
-开发过程中，我们参考了 [YuZuUI-Forge](https://github.com/) / SenrenBanka-UI 的渲染骨架（`VirtualScreen` + `Layer` + `TitleScreenButton` + `RenderUtils`），该架构更适合 Minecraft 原生 GUI 环境。重写带来的变化：
+开发过程中，我们参考了 [YuZuUI-Forge](https://github.com/ming-sc/YuZuUI-Forge) / SenrenBanka-UI 的渲染骨架（`VirtualScreen` + `Layer` + `TitleScreenButton` + `RenderUtils`），该架构更适合 Minecraft 原生 GUI 环境。重写带来的变化：
 
 | 方面 | 此分支（已放弃） | 新分支 |
 |------|-----------------|--------|
@@ -80,12 +80,8 @@ btns.forEachIndexed { i, b ->
 
 本项目的当前开发已迁移到以下分支：
 
-- **`1.21.1neoforge`** — NeoForge 1.21.1 版（Java + VirtualScreen 架构，推荐使用）
+- **`1.21.1neoforge`** — NeoForge 1.21.1 版（Java + VirtualScreen 架构）
 - **`1.20.1forge`** — Forge 1.20.1 版（相同架构，Forge 环境下使用）
-
-### 4. 资源文件
-
-此分支中的资源文件（`src/main/resources/assets/` 下的 PNG、OGG、JSON、OTF）已迁移到新分支，未做修改。**如果需要这些资源文件，请切换到 `1.21.1neoforge` 分支获取最新版本。**
 
 ## 构建
 
