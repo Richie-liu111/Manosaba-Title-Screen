@@ -4,7 +4,7 @@
 
 ### Mixin 兼容性加固
 
-基于 YuZuUI 上游 PR（link-fgfgui#1）的分析和修复，增强标题画面替换的健壮性。
+基于 YuZuUI 上游 PR（[link-fgfgui/YuZuUI-Forge#1](https://github.com/ming-sc/YuZuUI-Forge/pull/1)）的分析和修复，增强标题画面替换的健壮性。
 
 #### `MinecraftMixin`：双重拦截 `TitleScreen`
 
