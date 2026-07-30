@@ -43,6 +43,5 @@
 - 点击按钮 → 子界面显示（BGM 持续） → ESC 返回 → 无动画过渡
 
 ### 已知问题
-- 进入游戏世界后自定义 BGM 仍继续播放（需在 `onGuiClosed` 或 GuiOpenEvent 中检测并停止）
-- 启动画面（SplashOverlayRenderer）未移植（1.12.2 的加载流程与 1.20.1 差异较大）
+- 启动画面（SplashOverlayRenderer）未移植（1.12.2 的加载流程与 1.20.1 差异较大）【实际上是代替 Mojang 红白加载条，不过一般在资源包加载时才看得到，也不算是“启动画面”】
 - 退出对话框（ExitDialog）未移植
