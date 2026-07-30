@@ -1,0 +1,15 @@
+[
+  {
+    "modid": "manosaba",
+    "name": "Manosaba Title Screen",
+    "description": "Replaces the vanilla Minecraft title screen with the custom UI from 魔法少女ノ魔女裁判 (Magical Girl × Witch Trial).",
+    "version": "${modVersion}",
+    "mcversion": "1.7.10",
+    "url": "https://github.com/Richie-liu111/Manosaba-Title-Screen",
+    "authorList": ["Shiiyuko", "Richie-liu111"],
+    "credits": "Original Fabric mod by Shiiyuko. Forge/NeoForge/GTNH ports by Richie. GTNH 1.7.10 port based on YuZuUI-GTNH by Paulzzh (https://github.com/paulzzh/YuZuUI-GTNH). YuZuUI reference by ming-sc. Original game assets from 魔法少女ノ魔女裁判.",
+    "logoFile": "assets/manosaba/icon.png",
+    "screenshots": [],
+    "dependencies": ["GTNHLib", "UniMixins"]
+  }
+]

@@ -1,0 +1,27 @@
+{
+  "music": {
+    "category": "music",
+    "sounds": [
+      {
+        "name": "manosaba:music",
+        "stream": true
+      }
+    ]
+  },
+  "button_click_submit": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "manosaba:button_click_submit"
+      }
+    ]
+  },
+  "button_click_start_game": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "manosaba:button_click_start_game"
+      }
+    ]
+  }
+}
