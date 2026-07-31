@@ -1,5 +1,52 @@
 # Changelog
 
+## v1.0.5 — 2026-07-31
+
+### 还原原游戏四项功能（完整 v1.0.5，含 ExitDialog）
+
+基于 AssetRipper 解包（Boot.unity 场景、TitleUI.prefab、ProvidableDialog.prefab、System_Title.nani 剧本）与游戏截图实测，还原原游戏标题界面的全部四个缺失功能：
+
+#### 1. LoadGame 锁定态
+
+- 无存档时 LoadGame 按钮显示锁定纹理（`button_loadgame_locked.png`），无悬停高亮、无点击音效、不可点击
+- 判定：`LevelStorageSource.findLevelCandidates().isEmpty()`
+
+#### 2. 入场模糊 + 时间线对齐
+
+- 时序对齐 `System_Title.nani`：背景 1.05×→1.0×（EaseOutQuad，2700ms）+ 全屏黑幕淡出（1800ms）+ UI 延迟淡入
+- **模糊**：低分辨率 RenderTarget（640×360）+ 线性过滤上采样 = 高斯式模糊，blurPower 1→0 交叉淡化
+
+#### 3. 启动 Logo（BootLogoScreen）
+
+- 游戏加载完成后、首次进主界面之前播放发行商/开发商 logo（会话内仅一次，不可跳过）
+- 布局还原 Boot.unity 场景：BrandLogo（Acacia）787×309、CompanyLogo（REAER）1000×223，2560×1440 设计空间
+- 淡入 500ms → 停留 2500ms → 淡出 500ms
+
+#### 4. 退出确认对话框（ExitDialog）
+
+- 布局还原 ProvidableDialog.prefab（含 pivot 换算）：全屏压暗黑幕（Underlay α≈0.65）→ 亮色条带（Frame y 370..1070）→ 上下装饰暗条 → 消息黑字 → 取消/结束按钮
+- 文字用**原游戏字体**烘焙：消息黑字、按钮白字、「结」/「終」游戏强调粉（#E18796）
+- 文案：中「即将结束游戏。」取消/结束；日「ゲームを終了します。」キャンセル/終了する
+- 退出时序（对齐 `# QuitGame`）：停 BGM → 提交音效 → 关闭对话框 150ms → 主界面 UI 随黑幕同步淡出 1.2s → 退出游戏
+
+### 音乐系统重构
+
+- **MusicManager 抑制 + 标题 BGM 自行管理**：标题屏（含所有子界面）期间 MusicManager 被完全抑制（`MusicTickerMixin`），BGM 由主界面首个 tick 播放（黑幕开始淡出时响起）——消除了其初始延迟导致的音乐迟到
+- **子界面切换 BGM 持续**：Options/世界选择等子界面期间音乐不中断
+- **进世界停 BGM**：`ClientPlayerNetworkEvent.LoggingIn` 停止标题音乐并放行游戏音乐
+- **切语言重载后自动重播**：资源重载（SoundManager 重建）中断 BGM 后，overlay 关闭时自动从头重播
+- **退出期间 BGM 停止**：退出确认后音乐保持停止，不会被重播逻辑误触发
+
+### 音效（原游戏系统音效）
+
+- 接入原游戏 `Sfx_System_*_001`：结束=Sfx_System_Submit_001、取消=Sfx_System_Cancel_001、LoadGame=Sfx_System_LoadData_001、NewGame=Sfx_System_StartGame_001
+
+### 其他
+
+- **悬停屏蔽**：`TitleScreenButton` 新增 `setHoverable()`，退出对话框打开时底层按钮不响应悬停高亮
+- **黑幕渲染**：新增 `black.png` 纹理 + position-tex 绘制路径
+- **版本号**：1.0.4→1.0.5
+
 ## v1.0.4 — 2026-07-29
 
 ### Mixin 兼容性加固

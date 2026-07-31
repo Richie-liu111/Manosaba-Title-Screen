@@ -31,6 +31,7 @@ public final class TextureConst {
 
     public static final ResourceLocation BUTTON_LOAD_GAME_NORMAL = ui("button_loadgame_normal");
     public static final ResourceLocation BUTTON_LOAD_GAME_HIGHLIGHTED = ui("button_loadgame_highlighted");
+    public static final ResourceLocation BUTTON_LOAD_GAME_LOCKED = ui("button_loadgame_locked");
     public static final ResourceLocation BUTTON_NEW_GAME_NORMAL = ui("button_newgame_normal");
     public static final ResourceLocation BUTTON_NEW_GAME_HIGHLIGHTED = ui("button_newgame_highlighted");
     public static final ResourceLocation BUTTON_GALLERY_NORMAL = ui("button_gallery_normal");
@@ -51,4 +52,22 @@ public final class TextureConst {
 
     public static final ResourceLocation BRAND_LOGO = ui("brandlogo_acacia");
     public static final ResourceLocation COMPANY_LOGO = ui("companylogo_reaer");
+
+    // 退出对话框
+    public static final ResourceLocation DIALOG_BASE = ui("dialogbase");
+    public static final ResourceLocation TOP_FRAME = ui("topframe");
+    public static final ResourceLocation BOTTOM_FRAME = ui("bottomframe");
+    public static final ResourceLocation BUTTON_BASE_DEFAULT = ui("buttonbase_default");
+    public static final ResourceLocation BUTTON_BASE_HIGHLIGHTED = ui("buttonbase_highlighted");
+    public static final ResourceLocation DIALOG_MESSAGE_ZH = ui("dialog_message_zh");
+    public static final ResourceLocation DIALOG_MESSAGE_JA = ui("dialog_message_ja");
+
+    /** 纯黑 2×2 纹理（黑幕/压暗层） */
+    public static final ResourceLocation BLACK = ui("black");
+
+    /** 对话框按钮纹理 */
+    public static ResourceLocation dialogButton(String name, boolean highlighted, boolean zh) {
+        return ui("dialog_button_" + name + (zh ? "_zh" : "_ja")
+                + (highlighted ? "_highlighted" : "_default"));
+    }
 }

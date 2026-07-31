@@ -22,5 +22,37 @@
         "stream": false
       }
     ]
+  },
+  "sfx_system_submit_001": {
+    "sounds": [
+      {
+        "name": "manosaba:sfx_system_submit_001",
+        "stream": false
+      }
+    ]
+  },
+  "sfx_system_cancel_001": {
+    "sounds": [
+      {
+        "name": "manosaba:sfx_system_cancel_001",
+        "stream": false
+      }
+    ]
+  },
+  "sfx_system_loaddata_001": {
+    "sounds": [
+      {
+        "name": "manosaba:sfx_system_loaddata_001",
+        "stream": false
+      }
+    ]
+  },
+  "sfx_system_startgame_001": {
+    "sounds": [
+      {
+        "name": "manosaba:sfx_system_startgame_001",
+        "stream": false
+      }
+    ]
   }
 }

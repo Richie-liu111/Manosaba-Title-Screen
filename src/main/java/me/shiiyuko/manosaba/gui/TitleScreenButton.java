@@ -36,6 +36,7 @@ public class TitleScreenButton implements Renderable, GuiEventListener, Narratab
     private float collisionH;
 
     public boolean visible = true;
+    private boolean hoverable = true;
     private boolean isHovered = false;
     private boolean isFocused = false;
 
@@ -69,7 +70,7 @@ public class TitleScreenButton implements Renderable, GuiEventListener, Narratab
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
         if (this.visible) {
-            this.isHovered = this.isMouseOver(mouseX, mouseY);
+            this.isHovered = this.hoverable && this.isMouseOver(mouseX, mouseY);
             if (this.isHovered) {
                 RenderSystem.setShaderTexture(0, textureHover);
             } else {
@@ -101,7 +102,7 @@ public class TitleScreenButton implements Renderable, GuiEventListener, Narratab
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (this.visible && this.isMouseOver(mouseX, mouseY)) {
+        if (this.visible && this.hoverable && this.isMouseOver(mouseX, mouseY)) {
             if (this.clickSound != null) {
                 Minecraft.getInstance().getSoundManager().play(
                         SimpleSoundInstance.forUI(this.clickSound, 1.0f, 1.0f));
@@ -160,6 +161,10 @@ public class TitleScreenButton implements Renderable, GuiEventListener, Narratab
 
     public void setClickSound(SoundEvent clickSound) {
         this.clickSound = clickSound;
+    }
+
+    public void setHoverable(boolean h) {
+        this.hoverable = h;
     }
 
     /** 设置碰撞检测尺寸（居中于渲染矩形）。原游戏容器 < 精灵图，避免透明区域误触。 */
