@@ -24,6 +24,23 @@ public final class ManosabaSounds {
             SOUND_EVENTS.register("button_click_start_game", () -> SoundEvent.createVariableRangeEvent(
                     new ResourceLocation(Manosaba.MODID, "button_click_start_game")));
 
+    // 原游戏系统音效（Sfx_System_*_001，从原游戏提取）
+    public static final RegistryObject<SoundEvent> SFX_SYSTEM_SUBMIT =
+            SOUND_EVENTS.register("sfx_system_submit_001", () -> SoundEvent.createVariableRangeEvent(
+                    new ResourceLocation(Manosaba.MODID, "sfx_system_submit_001")));
+
+    public static final RegistryObject<SoundEvent> SFX_SYSTEM_CANCEL =
+            SOUND_EVENTS.register("sfx_system_cancel_001", () -> SoundEvent.createVariableRangeEvent(
+                    new ResourceLocation(Manosaba.MODID, "sfx_system_cancel_001")));
+
+    public static final RegistryObject<SoundEvent> SFX_SYSTEM_LOADDATA =
+            SOUND_EVENTS.register("sfx_system_loaddata_001", () -> SoundEvent.createVariableRangeEvent(
+                    new ResourceLocation(Manosaba.MODID, "sfx_system_loaddata_001")));
+
+    public static final RegistryObject<SoundEvent> SFX_SYSTEM_STARTGAME =
+            SOUND_EVENTS.register("sfx_system_startgame_001", () -> SoundEvent.createVariableRangeEvent(
+                    new ResourceLocation(Manosaba.MODID, "sfx_system_startgame_001")));
+
     private ManosabaSounds() {
     }
 }

@@ -35,6 +35,7 @@ public class TitleScreenButton implements Renderable, GuiEventListener, Narratab
     private float collisionH;
 
     public boolean visible = true;
+    private boolean hoverable = true;
     private boolean isHovered = false;
 
     private ResourceLocation texture;
@@ -68,7 +69,7 @@ public class TitleScreenButton implements Renderable, GuiEventListener, Narratab
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
         if (this.visible) {
-            this.isHovered = this.isMouseOver(mouseX, mouseY);
+            this.isHovered = this.hoverable && this.isMouseOver(mouseX, mouseY);
             if (this.isHovered) {
                 RenderSystem.setShaderTexture(0, textureHover);
             } else {
@@ -143,6 +144,11 @@ public class TitleScreenButton implements Renderable, GuiEventListener, Narratab
 
     public boolean isHovered() {
         return isHovered;
+    }
+
+    /** 是否响应悬停高亮（对话框打开时关闭，避免底层按钮变高亮）。 */
+    public void setHoverable(boolean hoverable) {
+        this.hoverable = hoverable;
     }
 
     public void setOnClick(Consumer<TitleScreenButton> onClick) {

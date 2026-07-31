@@ -1,5 +1,54 @@
 # Changelog
 
+## v1.0.5 — 2026-07-31
+
+### 还原原游戏四项功能
+
+基于 AssetRipper 解包（Boot.unity 场景、TitleUI.prefab、ProvidableDialog.prefab、System_Title.nani 剧本）与游戏截图实测，还原原游戏标题界面的四个缺失功能：
+
+#### 1. LoadGame 锁定态
+
+- 无存档时 LoadGame 按钮显示锁定纹理（`button_loadgame_locked.png`），无悬停高亮、无点击音效、不可点击
+- 判定：`LevelStorageSource.findLevelCandidates().isEmpty()`（同步扫描，与 vanilla SelectWorldScreen 同级开销）
+
+#### 2. 入场模糊 + 时间线对齐
+
+- 时序对齐 `System_Title.nani`：背景 1.05×→1.0×（EaseOutQuad，2700ms）+ 全屏黑幕淡出（1800ms）+ UI 延迟淡入
+- **模糊**：低分辨率 RenderTarget（640×360）+ 线性过滤上采样 = 高斯式模糊（同 Satin / 原版暂停菜单技术），blurPower 1→0 交叉淡化
+- 背景裁切模型：任何时刻可见区域都是 2:1 图的 16:9 裁切（1.0× = 88.89% 宽），非完整图
+
+#### 3. 启动 Logo（BootLogoScreen）
+
+- 游戏加载完成后、首次进主界面之前播放发行商/开发商 logo（会话内仅一次）
+- 布局还原 Boot.unity 场景：BrandLogo（Acacia）787×309 @ (−552, +24)、CompanyLogo（REAER）1000×223 @ (+536, −32)，2560×1440 设计空间并排显示
+- 淡入 500ms → 停留 2500ms → 淡出 500ms；任意键/点击跳过
+- `extends Screen` 而非 TitleScreen：logo 阶段不触发菜单音乐（BGM 在标题序列才开始，对齐 System_Title.nani 的 @bgm 时机）
+
+#### 4. 退出确认对话框（ExitDialog）
+
+- 布局还原 ProvidableDialog.prefab（含 pivot 换算）：全屏压暗黑幕（Underlay α≈0.65）→ 亮色条带（Frame 区域 y 370..1070）→ 上下装饰暗条（完整纹理不规则剪影）→ 消息黑字 → 取消/结束按钮
+- 文字用**原游戏字体**（SourceHanSerifSC / TsukushiMincho，自 AssetRipper 导出）烘焙成精灵：消息黑字、按钮白字、「结」/「終」游戏强调粉（#E18796，截图实测）
+- 文案：中「即将结束游戏。」取消/结束；日「ゲームを終了します。」キャンセル/終了する（終 粉红）
+- 退出时序（对齐 `# QuitGame`）：停 BGM → 提交音效 → 关闭对话框 150ms → **主界面 UI（按键/logo）随黑幕同步淡出 1.2s** → 全黑 → 退出游戏
+
+### 音乐系统重构
+
+- **MusicManager 抑制 + 标题 BGM 自行管理**：标题屏（含所有子界面）期间 MusicManager 被完全抑制，BGM 由主界面首个 tick 播放（黑幕开始淡出时响起）——消除了其 100 tick（5 秒）初始延迟导致的音乐迟到与子界面上的音乐叠加
+- **子界面切换 BGM 持续**：Options/世界选择等子界面期间音乐不中断（原游戏行为）
+- **进世界停 BGM**：`ClientPlayerNetworkEvent.LoggingIn` 停止标题音乐并放行游戏音乐
+- **切语言重载后自动重播**：资源重载（SoundManager 重建）中断 BGM 后，overlay 关闭时自动从头重播
+- **退出期间 BGM 停止**：退出确认后音乐保持停止（对齐 `@StopBgm fade:1.2`），不会被重播逻辑误触发
+
+### 音效（原游戏系统音效）
+
+- 接入原游戏 `Sfx_System_*_001`：结束=Sfx_System_Submit_001（stop() 后播放）、取消=Sfx_System_Cancel_001、LoadGame=Sfx_System_LoadData_001、NewGame=Sfx_System_StartGame_001
+
+### 其他
+
+- **悬停屏蔽**：`TitleScreenButton` 新增 `setHoverable()`，退出对话框打开时底层按钮不响应悬停高亮
+- **SplashOverlayRenderer 布局修正**：从 1920×1080@0.5 缩放改为原游戏 Boot.unity 原生坐标（2560×1440）
+- **黑幕渲染路径统一**：所有全屏压暗/淡出层改为黑色纹理 + position-tex 立即绘制，保证叠加顺序确定
+
 ## v1.0.4 — 2026-07-29
 
 ### Mixin 兼容性加固

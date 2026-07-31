@@ -1,5 +1,7 @@
 package me.shiiyuko.manosaba.mixin;
 
+import me.shiiyuko.manosaba.Manosaba;
+import me.shiiyuko.manosaba.gui.screen.BootLogoScreen;
 import me.shiiyuko.manosaba.gui.screen.ManosabaTitleScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
@@ -15,7 +17,9 @@ import org.spongepowered.asm.mixin.injection.Redirect;
  * <p>
  * Two-pronged approach:
  * <ol>
- *   <li>{@code @ModifyVariable} — 拦截传给 setScreen 的 TitleScreen 参数；</li>
+ *   <li>{@code @ModifyVariable} — 拦截传给 setScreen 的 TitleScreen 参数；
+ *       游戏加载完成后首次准备进主界面时先播启动 logo（BootLogoScreen），
+ *       播完再进 ManosabaTitleScreen 入场动画（会话内仅一次）；</li>
  *   <li>{@code @Redirect} — 兜底拦截 setScreen 调用栈内所有
  *       {@code new TitleScreen()}，防止某些代码路径（如读取存档→无存档→
  *       创建世界→返回）的 TitleScreen 实例不经过参数传递而漏网。</li>
@@ -27,6 +31,9 @@ public abstract class MinecraftMixin {
     @ModifyVariable(method = "setScreen", at = @At("HEAD"), ordinal = 0, argsOnly = true)
     private Screen manosaba$replaceTitleScreen(Screen screen) {
         if (screen instanceof TitleScreen && !(screen instanceof ManosabaTitleScreen)) {
+            if (!Manosaba.bootSequencePlayed) {
+                return new BootLogoScreen();
+            }
             return new ManosabaTitleScreen();
         }
         return screen;
