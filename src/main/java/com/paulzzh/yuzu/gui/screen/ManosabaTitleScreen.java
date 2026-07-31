@@ -8,11 +8,7 @@ import com.paulzzh.yuzu.init.ManosabaSounds;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.ISound;
 import net.minecraft.client.audio.PositionedSoundRecord;
-import net.minecraft.client.gui.GuiCreateWorld;
-import net.minecraft.client.gui.GuiMainMenu;
-import net.minecraft.client.gui.GuiMultiplayer;
-import net.minecraft.client.gui.GuiOptions;
-import net.minecraft.client.gui.GuiWorldSelection;
+import net.minecraft.client.gui.*;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
@@ -21,6 +17,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import org.lwjgl.opengl.GL11;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,8 +27,9 @@ import java.util.List;
  * 设计空间 2560×1440，背景 ContentScale.Crop（2:1→16:9），5 按钮原位置。
  * 1.12.2 移植版。
  *
- * 动画周期：RESIZE 不重置动画，ESC/游戏退出回来重置。
- * BGM：由本界面管理，离开时停止，回来时重置 → 不会重疊播放。
+ * <p>动画周期：RESIZE 不重置动画，ESC/游戏退出回来重置。
+ * BGM：由本界面管理（首 tick 即播，对齐原游戏 @bgm time:0 时机），
+ * 子界面期间持续，进世界时 MusicTicker 接管游戏 BGM。
  */
 public class ManosabaTitleScreen extends GuiMainMenu {
 
@@ -40,11 +38,13 @@ public class ManosabaTitleScreen extends GuiMainMenu {
     private static final int LOGO_W = 1039;
     private static final int LOGO_H = 622;
 
-    private static final long BG_DURATION = 2500L;
+    // 动画时序（毫秒），对齐原游戏 System_Title.nani：
+    // @animate Stills Scale:1.0 easing:EaseOutQuad time:2.7（缩放+模糊 2700ms）
+    // @back Overlay Transparent time:1.8（全屏黑幕淡出 1800ms）
+    private static final long BG_DURATION = 2700L;
     private static final long UI_DELAY = BG_DURATION + 250L;
     private static final long UI_DURATION = 500L;
-    /** BGM 延迟：对应原游戏开场白 − 约 1.2s */
-    private static final long MUSIC_DELAY = 1200L;
+    private static final long BLACK_FADE_MS = 1800L;
 
     private Layer backgroundLayer;
     private Layer overlayLayer;
@@ -89,16 +89,14 @@ public class ManosabaTitleScreen extends GuiMainMenu {
         prevH = height;
         firstInit = false;
 
-        // resize 或 ESC 回来：不重置动画/BGM，仅重建按钮
-        // 游戏退出回来：新实例 → 构造时已设 animStart → 全流程重播
-
         buttons.clear();
         initButtons();
     }
 
     private void initLayers() {
+        // 背景：1.05×→1.0× 缩放（原游戏 Scale:{default*1.05}→1.0），EaseOutQuad，2700ms。
         backgroundLayer = new Layer(TextureConst.background(),
-                0, 0, 2560, 1440, 1.1f, 1f, VIRTUAL_SCREEN);
+                0, 0, 2560, 1440, 1.05f, 1f, VIRTUAL_SCREEN);
         overlayLayer = new Layer(TextureConst.TITLE_OVERLAY,
                 0, 0, 2560, 1440, 1f, 0f, VIRTUAL_SCREEN);
         float logoCx = 1280 + 747, logoCy = 1440 - (720 + 381);
@@ -108,20 +106,42 @@ public class ManosabaTitleScreen extends GuiMainMenu {
     }
 
     private void initButtons() {
+        // 检测是否有存档（直接检查 saves 目录）
+        boolean loadLocked = !hasAnySaves();
+
         for (int i = 0; i < BUTTON_NAMES.length; i++) {
             String name = BUTTON_NAMES[i];
             float x = BUTTON_CX[i] - BUTTON_W[i] / 2f + NORMAL_OX[i];
             float y = (1440 - BUTTON_CY[i]) - BUTTON_H[i] / 2f + NORMAL_OY[i];
 
+            boolean locked = "LoadGame".equals(name) && loadLocked;
+            ResourceLocation nTex = locked ? TextureConst.BUTTON_LOAD_GAME_LOCKED : btnTex(name, false);
+            ResourceLocation hTex = locked ? TextureConst.BUTTON_LOAD_GAME_LOCKED : btnTex(name, true);
+
             TitleScreenButton b = new TitleScreenButton(x, y, BUTTON_W[i], BUTTON_H[i],
-                    btnTex(name, false), btnTex(name, true),
-                    VIRTUAL_SCREEN, 1f);
-            b.setClickSound(clickSound(name));
+                    nTex, hTex, VIRTUAL_SCREEN, 1f);
             b.setCollisionSize(COL_W[i], COL_H[i]);
-            b.setLabelTexture(lblTex(name), LABEL_W[i], LABEL_H[i], LABEL_OX[i], LABEL_OY[i]);
-            b.setOnClick(bb -> onButtonClick(name));
+            if (!locked) {
+                b.setClickSound(clickSound(name));
+                b.setLabelTexture(lblTex(name), LABEL_W[i], LABEL_H[i], LABEL_OX[i], LABEL_OY[i]);
+                b.setOnClick(bb -> onButtonClick(name));
+            } else {
+                b.setHoverable(false);
+            }
             buttons.add(b);
         }
+    }
+
+    /** 检查 saves 目录是否有存档（1.12.2 兼容方式）。 */
+    private static boolean hasAnySaves() {
+        File savesDir = new File(Minecraft.getMinecraft().gameDir, "saves");
+        if (!savesDir.isDirectory()) return false;
+        String[] files = savesDir.list();
+        if (files == null || files.length == 0) return false;
+        for (String f : files) {
+            if (new File(savesDir, f).isDirectory()) return true;
+        }
+        return false;
     }
 
     // ==================== 动画时钟 ====================
@@ -132,11 +152,17 @@ public class ManosabaTitleScreen extends GuiMainMenu {
         long e = elapsed();
         return e < UI_DELAY ? 0f : Math.min((float) (e - UI_DELAY) / UI_DURATION, 1f);
     }
+    /** 黑幕淡出进度（0→1）：全黑时=0，完全透明时=1 */
+    private static float blackFadeProg() {
+        return Math.min((float) elapsed() / BLACK_FADE_MS, 1f);
+    }
 
-    /** 更新所有元素的状态（基于 animStart 时钟，不依赖 per-instance startTime） */
+    /** 更新所有元素的状态（基于 animStart 时钟） */
     private void tickAnim() {
-        float bg = bgProg(), ui = uiProg();
-        backgroundLayer.setScale(1.1f - 0.1f * bg);
+        float bg = bgProg();
+        // 1.05→1.0 EaseOutQuad（原游戏 Scale:{default*1.05}→1.0 easing:EaseOutQuad）
+        backgroundLayer.setScale(1.0f + 0.05f * (1f - bg) * (1f - bg));
+        float ui = uiProg();
         overlayLayer.setAlpha(ui);
         logoLayer.setAlpha(ui);
         for (TitleScreenButton b : buttons) b.setAlpha(ui);
@@ -144,7 +170,7 @@ public class ManosabaTitleScreen extends GuiMainMenu {
 
     // ==================== BGM 管理 ====================
 
-    /** 停止 BGM（离开界面时 / 重新播放前） */
+    /** 停止 BGM */
     private static void stopBGM() {
         if (currentBGM != null) {
             Minecraft.getMinecraft().getSoundHandler().stopSound(currentBGM);
@@ -152,7 +178,7 @@ public class ManosabaTitleScreen extends GuiMainMenu {
         }
     }
 
-    /** 播放 BGM（先停旧的再播新的，防止叠加） */
+    /** 播放 BGM */
     private static void startBGM(SoundEvent event) {
         stopBGM();
         currentBGM = PositionedSoundRecord.getMasterRecord(event, 1.0f);
@@ -166,15 +192,19 @@ public class ManosabaTitleScreen extends GuiMainMenu {
         super.updateScreen();
         tickAnim();
 
-        // 延迟启动 BGM（不打断开场白）
-        if (currentBGM == null && elapsed() > MUSIC_DELAY) {
+        // BGM 在首 tick 即播放（原游戏 @bgm time:0，黑幕覆盖时音乐已响起）。
+        // 切语言 SoundHandler 重建后 BGM 被中断，检测到未播放则重播。
+        if (currentBGM == null) {
+            startBGM(ManosabaSounds.TITLE_MUSIC);
+        } else if (!Minecraft.getMinecraft().getSoundHandler().isSoundPlaying(currentBGM)) {
+            // 旧 ISound 已失效（SoundHandler 重建），重新播放
             startBGM(ManosabaSounds.TITLE_MUSIC);
         }
     }
 
     @Override
     public void onGuiClosed() {
-        // 切到子界面（Options/世界选择）时不停止 BGM，让它继续播放。
+        // 切到子界面（Options/世界选择）时不停止 BGM。
         // BGM 只会在退出游戏（shutdown）时自然停止。
     }
 
@@ -194,12 +224,12 @@ public class ManosabaTitleScreen extends GuiMainMenu {
 
         logoLayer.setTexture(isChinese() ? TextureConst.TITLE_LOGO_ZH : TextureConst.TITLE_LOGO_JA);
 
-        // 背景黑色
+        // 全屏黑色背景
         drawRect(0, 0, sw, sh, 0xFF000000);
 
         // Scissor
         GL11.glEnable(GL11.GL_SCISSOR_TEST);
-        int sf = new net.minecraft.client.gui.ScaledResolution(Minecraft.getMinecraft()).getScaleFactor();
+        int sf = new ScaledResolution(Minecraft.getMinecraft()).getScaleFactor();
         GL11.glScissor(cx * sf, Minecraft.getMinecraft().displayHeight - (cy + ch) * sf, cw * sf, ch * sf);
 
         GlStateManager.enableTexture2D();
@@ -229,13 +259,38 @@ public class ManosabaTitleScreen extends GuiMainMenu {
                     cx + cw - 60 - fontRenderer.getStringWidth(v) / 2,
                     cy + ch - 24, (a << 24) | 0xFFFFFF);
         }
+
+        // 全屏黑幕淡出（原游戏 @back Overlay Transparent time:1.8）
+        float blackAlpha = 1f - blackFadeProg();
+        if (blackAlpha > 0f) {
+            GlStateManager.enableBlend();
+            GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+            drawBlackOverlay(blackAlpha);
+            GlStateManager.disableBlend();
+        }
     }
+
+    /** 绘制半透明黑色覆盖层 */
+    private void drawBlackOverlay(float alpha) {
+        GlStateManager.color(1, 1, 1, alpha);
+        Minecraft.getMinecraft().getTextureManager().bindTexture(TextureConst.BLACK);
+        Tessellator tess = Tessellator.getInstance();
+        BufferBuilder buf = tess.getBuffer();
+        buf.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+        buf.pos(0, height, 0).tex(0, 1).endVertex();
+        buf.pos(width, height, 0).tex(1, 1).endVertex();
+        buf.pos(width, 0, 0).tex(1, 0).endVertex();
+        buf.pos(0, 0, 0).tex(0, 0).endVertex();
+        tess.draw();
+    }
+
+    // ==================== 背景 Crop ====================
 
     /** 背景 ContentScale.Crop */
     private void renderBgCrop() {
         float zoom = backgroundLayer.getScale();
         float alpha = backgroundLayer.getAlpha();
-        float baseU = 2048f * (16f / 9f) / 4096f; // 0.8889
+        float baseU = 2048f * (16f / 9f) / 4096f;
         float uFrac = baseU / zoom, vFrac = 1f / zoom;
         float u0 = (1f - uFrac) / 2f, v0 = (1f - vFrac) / 2f;
 
@@ -313,6 +368,10 @@ public class ManosabaTitleScreen extends GuiMainMenu {
     }
 
     private static SoundEvent clickSound(String name) {
-        return "NewGame".equals(name) ? ManosabaSounds.BUTTON_CLICK_START_GAME : ManosabaSounds.BUTTON_CLICK_SUBMIT;
+        return switch (name) {
+            case "LoadGame" -> ManosabaSounds.SFX_SYSTEM_LOADDATA;
+            case "NewGame" -> ManosabaSounds.SFX_SYSTEM_STARTGAME;
+            default -> ManosabaSounds.BUTTON_CLICK_SUBMIT;
+        };
     }
 }

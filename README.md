@@ -6,12 +6,14 @@
 
 ## 功能
 
+- **启动 Logo（BootLogoScreen）**：游戏加载完成后、首次进主界面之前播放发行商/开发商 logo，布局还原原游戏 Boot.unity 场景
 - **2560×1440 虚拟画布**：基于原游戏 CanvasScaler ReferenceResolution，所有 UI 元素使用原游戏坐标
-- **背景 ContentScale.Crop**：2:1（4096×2048）纹理裁切为 16:9，1.1× → 1.0× 缩放动画
+- **背景入场动画**：1.05×→1.0× EaseOutQuad 缩放（2700ms）+ 全屏黑幕淡出（1800ms），仿照原游戏 System_Title.nani 时序
 - **TitleOverlay + TitleLogo**：画框延迟淡入，Logo 随语言改变（简中 = 中文 Logo，其余 = 日文）
 - **5 个按钮**：原游戏 anchoredPosition 还原（2560×1440 设计空间内），Hover 高亮 + 中文标签叠加
+- **LoadGame 锁定态**：无存档时按钮显示锁定纹理，无悬停、无点击、无音效
+- **按钮独立音效**：LoadGame/NewGame 使用原游戏 Sfx_System 系统音效
 - **按钮中文标签**：悬停时显示原游戏 Label@ZhHans 精灵（仅简中语言环境）
-- **自定义背景音乐**：替换原版标题音乐，使用 Mixin 拦截 MusicTicker
 
 ## 按钮功能映射
 
@@ -38,7 +40,7 @@
 ./gradlew build
 ```
 
-构建产物位于 `build/libs/manosaba-1.0.4.jar`。
+构建产物位于 `build/libs/manosaba-1.0.5.jar`。
 
 ### 开发运行
 
@@ -82,7 +84,7 @@ assets/                 → 资源文件（纹理, 音效, JSON）
 
 - Mixin：`@Redirect` 拦截 `Minecraft.runTick()` → `MusicTicker.update()` 调用处（参考 YuZuUI-Vintage 写法）
 - inGame：`!inGame` 时全菜单界面（含 Options/世界选择等）拦截 MusicTicker，防止原版音乐在子界面响起；`MusicTickerAccessor` 清理残留声音
-- 自定义 BGM 由 `ManosabaTitleScreen.updateScreen()` 管理：延迟约 1.2s 启动，子界面切换时不中断
+- 自定义 BGM 由 `ManosabaTitleScreen.updateScreen()` 管理
 
 ### 动画
 

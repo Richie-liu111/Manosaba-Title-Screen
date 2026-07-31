@@ -27,6 +27,7 @@ public class TitleScreenButton {
     private float collisionH;
 
     public boolean visible = true;
+    private boolean hoverable = true;
     private boolean isHovered = false;
 
     private ResourceLocation texture;
@@ -58,7 +59,7 @@ public class TitleScreenButton {
 
     public void render(int mouseX, int mouseY) {
         if (this.visible) {
-            this.isHovered = this.isMouseOver(mouseX, mouseY);
+            this.isHovered = this.hoverable && this.isMouseOver(mouseX, mouseY);
             ResourceLocation tex = this.isHovered ? textureHover : texture;
             Minecraft.getMinecraft().getTextureManager().bindTexture(tex);
             GlStateManager.color(1.0F, 1.0F, 1.0F, alpha);
@@ -79,7 +80,7 @@ public class TitleScreenButton {
     }
 
     public boolean mouseClicked(int mouseX, int mouseY, int mouseButton) {
-        if (this.visible && mouseButton == 0 && this.isMouseOver(mouseX, mouseY)) {
+        if (this.visible && this.hoverable && mouseButton == 0 && this.isMouseOver(mouseX, mouseY)) {
             if (this.clickSound != null) {
                 Minecraft.getMinecraft().getSoundHandler().playSound(
                         PositionedSoundRecord.getMasterRecord(this.clickSound, 1.0f));
@@ -110,6 +111,11 @@ public class TitleScreenButton {
 
     public void setClickSound(SoundEvent clickSound) {
         this.clickSound = clickSound;
+    }
+
+    /** 设置是否响应悬停高亮和点击。锁定态按钮可设为 false。 */
+    public void setHoverable(boolean h) {
+        this.hoverable = h;
     }
 
     public void setCollisionSize(float w, float h) {

@@ -1,5 +1,6 @@
 package com.paulzzh.yuzu;
 
+import com.paulzzh.yuzu.gui.screen.BootLogoScreen;
 import com.paulzzh.yuzu.gui.screen.ManosabaTitleScreen;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.gui.GuiScreen;
@@ -12,7 +13,7 @@ import net.minecraftforge.fml.relauncher.Side;
 
 /**
  * Manosaba 事件处理器。
- * - GuiOpenEvent：替换 GuiMainMenu → ManosabaTitleScreen
+ * - GuiOpenEvent：替换 GuiMainMenu → ManosabaTitleScreen（首次先进 BootLogoScreen）
  * - ClientConnectedToServer：标记 inGame = true → Mixin 放行 MusicTicker
  */
 @Mod.EventBusSubscriber(modid = Manosaba.MODID, value = Side.CLIENT)
@@ -22,6 +23,12 @@ public class EventHandler {
     public static void onGuiOpen(GuiOpenEvent event) {
         GuiScreen gui = event.getGui();
         if (gui instanceof GuiMainMenu && !(gui instanceof ManosabaTitleScreen)) {
+            // 首次进主界面：先播放启动 logo，再进 Manosaba 标题入场
+            if (!Manosaba.bootSequencePlayed) {
+                event.setGui(new BootLogoScreen());
+                Manosaba.inGame = false;
+                return;
+            }
             event.setGui(new ManosabaTitleScreen());
             Manosaba.inGame = false;
             Manosaba.LOGGER.info("inGame = false (title screen shown)");

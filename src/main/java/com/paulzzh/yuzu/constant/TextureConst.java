@@ -31,6 +31,7 @@ public final class TextureConst {
     // 按钮精灵
     public static final ResourceLocation BUTTON_LOAD_GAME_NORMAL = ui("button_loadgame_normal");
     public static final ResourceLocation BUTTON_LOAD_GAME_HIGHLIGHTED = ui("button_loadgame_highlighted");
+    public static final ResourceLocation BUTTON_LOAD_GAME_LOCKED = ui("button_loadgame_locked");
     public static final ResourceLocation BUTTON_NEW_GAME_NORMAL = ui("button_newgame_normal");
     public static final ResourceLocation BUTTON_NEW_GAME_HIGHLIGHTED = ui("button_newgame_highlighted");
     public static final ResourceLocation BUTTON_GALLERY_NORMAL = ui("button_gallery_normal");
@@ -55,4 +56,11 @@ public final class TextureConst {
     public static final ResourceLocation BOTTOM_FRAME = ui("bottomframe");
     public static final ResourceLocation BUTTON_BASE_DEFAULT = ui("buttonbase_default");
     public static final ResourceLocation BUTTON_BASE_HIGHLIGHTED = ui("buttonbase_highlighted");
+
+    /** 纯黑 2×2 纹理（黑幕/压暗层） */
+    public static final ResourceLocation BLACK = ui("black");
+
+    // 启动画面
+    public static final ResourceLocation BRAND_LOGO = ui("brandlogo_acacia");
+    public static final ResourceLocation COMPANY_LOGO = ui("companylogo_reaer");
 }

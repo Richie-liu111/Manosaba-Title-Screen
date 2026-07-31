@@ -1,5 +1,49 @@
 # Changelog
 
+## v1.0.5 — 2026-07-31
+
+### 还原原游戏四项功能（同步 forge-1.20.1 + gtnh-1.7.10）
+
+基于原游戏 `System_Title.nani` 剧本与 `Boot.unity` 场景数据，还原标题界面的四个缺失功能：
+
+#### 1. 启动 Logo（BootLogoScreen）
+
+- 游戏加载完成后、首次进主界面之前播放发行商/开发商 logo（会话内仅一次，不可跳过）
+- 布局还原 Boot.unity 场景：BrandLogo（Acacia）787×309 @ (−552, +24)、CompanyLogo（REAER）1000×223 @ (+536, −32)，2560×1440 设计空间
+- 淡入 500ms → 停留 2500ms → 淡出 500ms；通过 `GuiOpenEvent` 首次路由
+- 继承 `GuiScreen`：logo 阶段不触发菜单音乐
+
+#### 2. LoadGame 锁定态
+
+- 无存档时 LoadGame 按钮显示锁定纹理（`button_loadgame_locked.png`），双态均为锁定纹理 → 无悬停高亮
+- `setHoverable(false)` + 无 `clickSound` + 无 `onClick` 回调，完全不可交互
+- 判定：直接检查 `gameDir/saves/` 目录是否存在子目录
+
+#### 3. 入场时间线对齐
+
+- 时序对齐 `System_Title.nani`：背景 1.05×→1.0×（EaseOutQuad，2700ms）+ 全屏黑幕淡出（1800ms）
+- **BGM 对齐**：`@bgm` 在 time:0 即播放（首 tick，黑幕覆盖时音乐已响起），去掉旧版 1200ms 延迟
+- **BGM 切语言重播**：检测 `isSoundPlaying()`，SoundHandler 重建后自动重播
+
+#### 4. 音效完善
+
+- 按钮独立音效：LoadGame→Sfx_System_LoadData_001、NewGame→Sfx_System_StartGame_001、其余→button_click_submit
+- `ManosabaSounds` 新增 `SFX_SYSTEM_LOADDATA`、`SFX_SYSTEM_STARTGAME` 注册
+
+### 其他改进
+
+- **`TitleScreenButton` 新增 `hoverable` 字段** + `setHoverable()`：锁定态按钮完全禁用悬停和点击
+- **`EventHandler` 启动 logo 路由**：`onGuiOpen` 检查 `Manosaba.bootSequencePlayed` → 首次先进 BootLogoScreen
+- **黑幕渲染**：新增 `black.png` 纹理 + `drawBlackOverlay()` 方法
+- **纹理常量**：`TextureConst` 新增 `BLACK`、`BUTTON_LOAD_GAME_LOCKED`、`BRAND_LOGO`、`COMPANY_LOGO`
+- **版本号**：1.0.4→1.0.5
+
+### 已知限制
+
+- **入场模糊未移植**：FBO 渲染在 1.12.2 下投影矩阵处理复杂且方向错误，保留黑幕淡出效果
+- **退出确认对话框（ExitDialog）未移植**：装饰条布局与 FBO 渲染复杂度较高
+- **启动画面（SplashOverlayRenderer）未移植**：1.12.2 加载流程差异大
+
 ## v1.0.4 (2026-07-30) — 1.12.2 Initial Port
 
 ### 关于此版本

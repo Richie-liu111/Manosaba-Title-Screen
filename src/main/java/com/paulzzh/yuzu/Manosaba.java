@@ -18,11 +18,13 @@ import org.apache.logging.log4j.Logger;
 public class Manosaba {
     public static final String MODID = "manosaba";
     public static final String NAME = "Manosaba";
-    public static final String VERSION = "1.0.4";
+    public static final String VERSION = "1.0.5";
 
     public static Logger LOGGER;
     /** 玩家是否在游戏世界中（非菜单界面）。Mixin 靠此判断是否拦截 MusicTicker */
     public static boolean inGame = false;
+    /** 启动 logo 序列是否已播放（会话内仅一次）。 */
+    public static boolean bootSequencePlayed = false;
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
