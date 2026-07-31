@@ -23,5 +23,21 @@
         "name": "manosaba:button_click_start_game"
       }
     ]
+  },
+  "sfx_system_loaddata_001": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "manosaba:sfx_system_loaddata_001"
+      }
+    ]
+  },
+  "sfx_system_startgame_001": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "manosaba:sfx_system_startgame_001"
+      }
+    ]
   }
 }

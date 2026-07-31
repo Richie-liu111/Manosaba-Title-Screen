@@ -16,6 +16,9 @@ public class Manosaba {
     public static final String MODID = "manosaba";
     public static final Logger LOG = LogManager.getLogger(MODID);
 
+    /** 启动 logo 序列是否已播放（会话内仅一次：首次进主界面时播放）。 */
+    public static boolean bootSequencePlayed = false;
+
     @SidedProxy(clientSide = "me.shiiyuko.manosaba.ClientProxy",
                 serverSide = "me.shiiyuko.manosaba.CommonProxy")
     public static CommonProxy proxy;

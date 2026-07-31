@@ -23,13 +23,16 @@
 
 ## 功能
 
+- **启动 Logo（BootLogoScreen）**：游戏加载完成后、首次进主界面之前播放发行商/开发商 logo（会话内一次，任意键跳过），布局还原原游戏 Boot.unity 场景
 - **2560×1440 虚拟画布**：基于原游戏 CanvasScaler ReferenceResolution，所有 UI 元素使用精确坐标
-- **背景缩放动画**：2:1 纹理 ContentScale.Crop 到 16:9，1.1× → 1.0× 呼吸效果
+- **背景入场动画**：1.05×→1.0× EaseOutQuad 缩放（2700ms）+ 入场模糊（FBO 低分辨率上采样）+ 全屏黑幕淡出（1800ms），严格对齐原游戏 System_Title.nani 时序
+- **背景音乐即时播放**：BGM 在 time:0（首 tick）即播放，黑幕覆盖时音乐已响起，对齐原游戏 @bgm 时机
 - **TitleOverlay + TitleLogo**：画框延迟淡入，Logo 随语言自适应（简中=中文 Logo，其余=日文）
 - **5 个按钮**：原游戏 anchoredPosition 精确还原，Hover 高亮 + 中文标签叠加
+- **LoadGame 锁定态**：无存档时按钮显示锁定纹理，无悬停、无点击、无音效
+- **按钮独立音效**：LoadGame/NewGame 使用原游戏 Sfx_System 系统音效
 - **按钮中文标签**：悬停时显示原游戏 Label@ZhHans 精灵（仅简中语言）
 - **背景角色切换**：希罗 / 艾玛，游戏内配置即时生效
-- **自定义背景音乐**：原游戏标题曲（GTNH 整合包中由 GTNH 音乐系统接管）
 
 ## 配置
 

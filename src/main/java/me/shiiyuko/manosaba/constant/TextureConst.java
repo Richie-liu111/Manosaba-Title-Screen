@@ -46,4 +46,10 @@ public final class TextureConst {
 
     public static final ResourceLocation BRAND_LOGO = ui("brandlogo_acacia");
     public static final ResourceLocation COMPANY_LOGO = ui("companylogo_reaer");
+
+    /** 纯黑 2×2 纹理（黑幕/压暗层用，与元素同路径保证渲染） */
+    public static final ResourceLocation BLACK = ui("black");
+
+    /** LoadGame 锁定态纹理 */
+    public static final ResourceLocation BUTTON_LOAD_GAME_LOCKED = ui("button_loadgame_locked");
 }

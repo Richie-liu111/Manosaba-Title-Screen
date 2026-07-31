@@ -1,5 +1,7 @@
 package me.shiiyuko.manosaba.mixins.early.minecraft;
 
+import me.shiiyuko.manosaba.Manosaba;
+import me.shiiyuko.manosaba.gui.BootLogoScreen;
 import me.shiiyuko.manosaba.gui.ManosabaTitleScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiMainMenu;
@@ -14,6 +16,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 /**
  * 拦截 {@link Minecraft#displayGuiScreen}，将原版 {@link GuiMainMenu} 替换为
  * Manosaba 自定义标题画面。兼容 CustomMainMenu。
+ * <p>
+ * 首次进主界面时先播启动 logo（BootLogoScreen），播完再进
+ * ManosabaTitleScreen 入场动画（会话内仅一次）。
  * <p>
  * 参考 YuZuUI-GTNH 的 exit / inGamed 守卫：
  * <ul>
@@ -32,6 +37,11 @@ public class MinecraftMixin {
         if (guiScreenIn instanceof GuiMainMenu
             || (guiScreenIn != null && "lumien.custommainmenu.gui.GuiCustom".equals(
                 guiScreenIn.getClass().getCanonicalName()))) {
+            // 首次进主界面：先播放启动 logo，再进 Manosaba 标题入场
+            if (!Manosaba.bootSequencePlayed) {
+                Minecraft.getMinecraft().displayGuiScreen(new BootLogoScreen());
+                return;
+            }
             if (manosaba$instance == null) {
                 manosaba$instance = new ManosabaTitleScreen();
             }

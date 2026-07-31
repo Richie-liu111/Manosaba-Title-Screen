@@ -21,6 +21,7 @@ public class TitleScreenButton {
     private float alpha;
     private boolean visible = true;
     private boolean isHovered = false;
+    private boolean hoverable = true;
 
     /** 碰撞检测尺寸（默认 = 纹理尺寸），居中于渲染矩形内 */
     private float collisionW;
@@ -39,6 +40,9 @@ public class TitleScreenButton {
     private float labelOffsetY;
 
     private Consumer<TitleScreenButton> onClick;
+
+    /** 点击音效（null = 无音效，用于锁定态按钮） */
+    private ResourceLocation clickSound;
 
     // 动画相关
     private Long duration;
@@ -65,7 +69,7 @@ public class TitleScreenButton {
     public void render(int mouseX, int mouseY, float delta) {
         if (!this.visible) return;
 
-        this.isHovered = this.isMouseOver(mouseX, mouseY);
+        this.isHovered = this.hoverable && this.isMouseOver(mouseX, mouseY);
 
         GL11.glColor4f(1.0F, 1.0F, 1.0F, alpha);
 
@@ -95,7 +99,11 @@ public class TitleScreenButton {
     }
 
     public void mousePressed(int mouseX, int mouseY) {
-        if (this.visible && isMouseOver(mouseX, mouseY)) {
+        if (this.visible && this.hoverable && isMouseOver(mouseX, mouseY)) {
+            if (this.clickSound != null) {
+                mc.getSoundHandler().playSound(
+                        net.minecraft.client.audio.PositionedSoundRecord.func_147673_a(this.clickSound));
+            }
             if (onClick != null) {
                 onClick.accept(this);
             }
@@ -132,6 +140,12 @@ public class TitleScreenButton {
     public void setOnClick(Consumer<TitleScreenButton> onClick) { this.onClick = onClick; }
     /** 设置碰撞检测尺寸（居中于渲染矩形） */
     public void setCollisionSize(float w, float h) { this.collisionW = w; this.collisionH = h; }
+
+    /** 设置是否响应悬停高亮和点击。locked=true 时可设为 false。 */
+    public void setHoverable(boolean h) { this.hoverable = h; }
+
+    /** 设置点击音效的 ResourceLocation。null = 无音效。 */
+    public void setClickSound(ResourceLocation sound) { this.clickSound = sound; }
 
     public void setLabelTexture(ResourceLocation texture, float w, float h, float offsetX, float offsetY) {
         this.labelTexture = texture;
