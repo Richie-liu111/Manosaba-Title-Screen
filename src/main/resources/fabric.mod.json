@@ -3,11 +3,12 @@
 	"id": "manosaba",
 	"version": "${version}",
 	"name": "Manosaba Title Screen",
-	"description": "Replaces the vanilla title screen with a custom UI inspired by 魔法少女ノ魔女裁判 (Magical Girl × Witch Trial).",
+	"description": "Manosaba title screen port (Fabric 1.21.10).\nOriginal Fabric mod by Shiiyuko.",
 	"authors": [
-		"shiiyuko"
+		"Shiiyuko",
+		"Richie-liu111"
 	],
-	"license": "ARR",
+	"license": "Apache-2.0",
 	"icon": "assets/manosaba/icon.png",
 	"environment": "client",
 	"entrypoints": {
