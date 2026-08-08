@@ -1,0 +1,30 @@
+{
+	"schemaVersion": 1,
+	"id": "manosaba",
+	"version": "${version}",
+	"name": "Manosaba Title Screen",
+	"description": "Replaces the vanilla title screen with a custom UI inspired by 魔法少女ノ魔女裁判 (Magical Girl × Witch Trial).",
+	"authors": [
+		"shiiyuko"
+	],
+	"license": "ARR",
+	"icon": "assets/manosaba/icon.png",
+	"environment": "client",
+	"entrypoints": {
+		"client": [
+			"me.shiiyuko.manosaba.ManosabaClient"
+		]
+	},
+	"mixins": [
+		{
+			"config": "manosaba.client.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=0.19.3",
+		"minecraft": "~1.21.10",
+		"java": ">=21",
+		"fabric-api": "*"
+	}
+}

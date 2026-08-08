@@ -1,0 +1,58 @@
+{
+  "music": {
+    "sounds": [
+      {
+        "name": "manosaba:music",
+        "stream": true
+      }
+    ]
+  },
+  "button_click_submit": {
+    "sounds": [
+      {
+        "name": "manosaba:button_click_submit",
+        "stream": false
+      }
+    ]
+  },
+  "button_click_start_game": {
+    "sounds": [
+      {
+        "name": "manosaba:button_click_start_game",
+        "stream": false
+      }
+    ]
+  },
+  "sfx_system_submit_001": {
+    "sounds": [
+      {
+        "name": "manosaba:sfx_system_submit_001",
+        "stream": false
+      }
+    ]
+  },
+  "sfx_system_cancel_001": {
+    "sounds": [
+      {
+        "name": "manosaba:sfx_system_cancel_001",
+        "stream": false
+      }
+    ]
+  },
+  "sfx_system_loaddata_001": {
+    "sounds": [
+      {
+        "name": "manosaba:sfx_system_loaddata_001",
+        "stream": false
+      }
+    ]
+  },
+  "sfx_system_startgame_001": {
+    "sounds": [
+      {
+        "name": "manosaba:sfx_system_startgame_001",
+        "stream": false
+      }
+    ]
+  }
+}
