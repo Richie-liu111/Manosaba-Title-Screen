@@ -1,12 +1,12 @@
 # SYNC.md — 跨分支同步指南
 
-Manosaba 的 6 个分支是 **同一个 GitHub 仓库的不同分支**，各自独立演进。
-没有 submodule，没有共享目录，也没有构建期的同步机制。
+Manosaba 的 6 个在维护分支（另有 1 个已归档）是**同一个 GitHub 仓库的不同分支**，
+各自独立演进。没有 submodule，没有共享目录，也没有构建期的同步机制。
 
 这份文档回答一个问题：**我在一支上改了东西，其余几支要不要跟着改？**
 
 配套工具：`drift-report.sh`——**只读脚本，放在工作区根目录，故意不入库**，
-因为它硬编码了本机 5 个工作副本的绝对路径（提交到公开仓库属于无谓的信息泄露，
+因为它硬编码了本机 6 个工作副本的绝对路径（提交到公开仓库属于无谓的信息泄露，
 且对别人毫无用处）。下文提到的 `drift-report.sh` 都指这个脚本。
 
 ---
@@ -20,10 +20,12 @@ Manosaba 的 6 个分支是 **同一个 GitHub 仓库的不同分支**，各自�
 | `1.7.10gtnh` | `1.7.10gtnh/` | 1.7.10 | Forge (GTNH) | v1.0.5 |
 | `1.12.2forge` | `1.12.2forge/` | 1.12.2 | Forge (RFG) | v1.0.5 |
 | `1.21.10fabric` | `fabric-example-mod-1.21.10/` | 1.21.10 | Fabric | v1.0.5 |
+| `1.21.11fabric` | `fabric-example-mod-1.21.11/` | 1.21.11 | Fabric | v1.0.5 |
 | `mc/1.21.1-neoforge` | `Manosaba-Title-Screen/` | 1.21.1 | NeoForge + Kotlin | 已归档，不再维护 |
 
-另有 `fabric-example-mod-1.21.11/`——**不是 git 仓库，远端也没有对应分支**，
-目前是纯本地目录。要纳入同步体系得先决定怎么版本化。
+`1.21.11fabric` 在 2026-10-08 才纳入版本控制：此前 `fabric-example-mod-1.21.11/`
+只是一个无版本控制的普通目录。建分支时以 `1.21.10fabric` 为父提交（CHANGELOG 里
+本来就记着「源码移植自 1.21.10fabric」），所以历史是连续的，不是一次性的初始提交。
 
 跑 `drift-report.sh` 可以随时打印这张表的实时状态（HEAD + 是否干净）。
 
@@ -35,7 +37,7 @@ Manosaba 的 6 个分支是 **同一个 GitHub 仓库的不同分支**，各自�
 
 | 文件 | 是否应逐字一致 | 说明 |
 |---|---|---|
-| `AnimationFunction.java` | ✅ 是 | 6 行函数式接口，全 5 支当前完全一致 |
+| `AnimationFunction.java` | ✅ 是 | 6 行函数式接口，全 6 支当前完全一致 |
 | `VirtualScreen.java` | ✅ 基本是 | 坐标换算纯数学，只有 1.7.10 因 API 差异不同 |
 | `Layer.java` | ⚠️ 逻辑同步 | 渲染后端不同，但**动画时序 / 碰撞 / alpha 数学**必须同步 |
 | `TitleScreenButton.java` | ⚠️ 逻辑同步 | 同上；各支都有独立交互适配 |
@@ -44,8 +46,8 @@ Manosaba 的 6 个分支是 **同一个 GitHub 仓库的不同分支**，各自�
 
 ### 其余需要留意的共享内容
 
-- `TextureConst`（各支包位置相同）——纹理路径表，新增素材时 5 支都要加
-- `assets/manosaba/**`——纹理与音效，各支是副本，改素材要 5 支一起换
+- `TextureConst`（各支包位置相同）——纹理路径表，新增素材时 6 支都要加
+- `assets/manosaba/**`——纹理与音效，各支是副本，改素材要 6 支一起换
 - `CHANGELOG.md`——**各支独立**，记录本支的移植差异
 
 ### 修一个 bug 之后
@@ -121,6 +123,7 @@ Manosaba 的 6 个分支是 **同一个 GitHub 仓库的不同分支**，各自�
 | `1.7.10gtnh` | `.github/workflows/build.yml` | 17（Gradle 用；compile toolchain 由 GTNH 插件配） |
 | `1.12.2forge` | `.github/workflows/build.yml` | 17（Gradle 用；compile toolchain 8 / Azul 16 靠 foojay 自动下载） |
 | `1.21.10fabric` | `.github/workflows/build.yml` | 25（Fabric MDK 模板原样） |
+| `1.21.11fabric` | `.github/workflows/build.yml` | 25（同上，继承自 1.21.10） |
 
 四支的 toolchain 自动下载都靠 `settings.gradle` 里的
 `org.gradle.toolchains.foojay-resolver-convention`；1.12.2forge 的构建还指定了
@@ -130,16 +133,16 @@ Manosaba 的 6 个分支是 **同一个 GitHub 仓库的不同分支**，各自�
 
 ## 5. 当前漂移快照
 
-`drift-report.sh` 在 2026-10-07 的输出摘要（归一化后 hash，同 hash = 逻辑一致）：
+`drift-report.sh` 在 2026-10-08 的输出摘要（归一化后 hash，同 hash = 逻辑一致）：
 
 | 文件 | 逻辑一致的分组 |
 |---|---|
-| `AnimationFunction.java` | **全部 5 支一致** ✅ |
-| `VirtualScreen.java` | forge / 1.12.2 / fabric / neoforge 一致；1.7.10 独立 |
+| `AnimationFunction.java` | **全部 6 支一致** ✅ |
+| `VirtualScreen.java` | 5 支一致；1.7.10 独立 |
 | `Layer.java` | 只有 `1.20.1forge` + `1.21.1neoforge` 一致 |
-| `TitleScreenButton.java` | **5 支全不同** |
-| `RenderUtils.java` | **5 支全不同**（预期内） |
-| `ManosabaTitleScreen.java` | **5 支全不同**（预期内） |
+| `TitleScreenButton.java` | **6 支全不同** |
+| `RenderUtils.java` | **6 支全不同**（预期内） |
+| `ManosabaTitleScreen.java` | **6 支全不同**（预期内） |
 
 `Layer.java` 值得看一眼：它是"逻辑应该同步"的文件，但只有两支一致——
-说明第一批次的 `Long` 拆箱修复虽然推到了 5 支，其余历史改动没有一起带过去。
+说明第一批次的 `Long` 拆箱修复虽然推到了 6 支，其余历史改动没有一起带过去。
