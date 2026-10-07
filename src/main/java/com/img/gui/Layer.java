@@ -124,7 +124,7 @@ public class Layer {
     private AnimationFunction<Float> scaleFunction;
 
     public void tick() {
-        if (delay == null || duration == 0) {
+        if (delay == null || duration == null || duration == 0L) {
             return;
         }
 

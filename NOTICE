@@ -1,0 +1,57 @@
+Manosaba Title Screen — NOTICE
+==============================
+
+本项目自有代码以 Apache License 2.0 授权，全文见 LICENSE。
+
+本文件列出不属于本项目著作权、但被本项目使用的第三方作品及其授权状态。
+
+
+1. YuZuUI —— UI 渲染骨架
+------------------------
+
+涉及文件：Layer / VirtualScreen / TitleScreenButton / AnimationFunction / RenderUtils
+
+ 原始作者：IMG
+
+ 上游仓库：
+   https://github.com/RuiXuqi/YuZuUI-Vintage   (本分支的渲染架构与构建体系参考)
+   https://github.com/ming-sc/YuZuUI-Forge     (Forge 1.20.1，原始 YuZuUI)
+   https://github.com/ming-sc/YuZuUI-Fabric    (Fabric，CC0-1.0)
+   https://github.com/paulzzh/YuZuUI-GTNH      (Forge 1.7.10)
+
+本模组的上述文件派生自这些项目。授权状态说明：
+
+ - YuZuUI-Fabric 以 CC0-1.0（公有领域奉献）发布，无附加条件；
+ - YuZuUI-Forge / GTNH / Vintage 的 LICENSE.txt 为 Minecraft Forge MDK 的
+   默认样板文件，未另行声明授权条款。
+
+考虑到二者出自同一作者、且作者已有一处以 CC0 发布同一套框架代码，本项目认为
+作者的授权意图是宽松的，并据此在保留原作者署名（IMG 及 RuiXuqi 等移植作者）
+的前提下使用这些代码。
+
+本分支中的派生文件（路径相对 src/main/java/）：
+
+   com/img/gui/Layer.java
+   com/img/gui/VirtualScreen.java
+   com/img/gui/TitleScreenButton.java
+   com/img/function/AnimationFunction.java
+   com/paulzzh/yuzu/gui/RenderUtils.java
+
+
+2. 魔法少女ノ魔女裁判（Magical Girl × Witch Trial）游戏素材
+---------------------------------------------------------
+
+本模组包含的纹理、音效等素材版权归原游戏开发商所有，
+不在本项目的 Apache-2.0 授权范围内。
+
+
+3. Manosaba-Title-Screen（原项目）
+---------------------------------
+
+   https://github.com/Shiiyuko/Manosaba-Title-Screen
+
+本项目为其跨平台移植版，原项目作者 Shiiyuko。
+
+
+如你是上述任一权利持有人并对此处的使用有异议，请通过
+https://github.com/Richie-liu111/Manosaba-Title-Screen 联系。
