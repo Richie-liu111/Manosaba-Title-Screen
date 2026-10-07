@@ -1,5 +1,25 @@
 # Changelog
 
+## v1.0.5 — 2026-10-07（工程化：CI + 跨分支同步工具）
+
+### 新增 CI
+
+`.github/workflows/build.yml`：push / PR 时 `./gradlew build` 并上传 `build/libs/` 产物。
+JDK 17（ForgeGradle 6 运行需求，同时满足 `java.toolchain.languageVersion = 17`）。
+此前本分支从未被自动编译验证过。
+
+### 新增跨分支同步文档
+
+`SYNC.md`（本支根目录）——分支↔目录映射、哪些文件必须跨支同步 / 哪些本就该不同
+（含各支路径差异表）、`Screen.renderBackground` 在 1.21.9 的调用约定反转等已知坑、
+以及"修一个 bug 之后"的同步 checklist。
+
+放在默认分支（本支），不复制到其余分支——同步文档不该分散在被同步的对象里。
+
+配套的 `drift-report.sh` 只读脚本**不入库**：它硬编码了本机 5 个工作副本的绝对路径
+（`/Users/<用户名>/Projects/...`），提交到公开仓库属于无谓的信息泄露，对别人也毫无用处。
+脚本本体放在工作区根目录，用法见 `SYNC.md` 开头。
+
 ## v1.0.5 — 2026-07-31
 
 ### 还原原游戏四项功能
