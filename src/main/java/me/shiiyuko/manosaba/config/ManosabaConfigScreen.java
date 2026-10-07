@@ -45,7 +45,7 @@ public class ManosabaConfigScreen extends Screen {
         this.renderBackground(guiGraphics, mouseX, mouseY, delta);
         guiGraphics.drawCenteredString(this.font, this.title, this.width / 2, 20, 0xFFFFFF);
         guiGraphics.drawCenteredString(this.font,
-                Component.literal("重启游戏或重新进入标题画面后生效"),
+                Component.literal("切换后立即生效（已保存到配置文件）"),
                 this.width / 2, this.height / 2 + 55, 0xAAAAAA);
         super.render(guiGraphics, mouseX, mouseY, delta);
     }

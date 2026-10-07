@@ -14,7 +14,7 @@
 #### 2. 入场模糊 + 时间线对齐
 
 - 时序对齐 `System_Title.nani`：背景 1.05×→1.0×（EaseOutQuad，2700ms）+ 全屏黑幕淡出（1800ms）+ UI 延迟淡入
-- **模糊**：低分辨率 RenderTarget（640×360）+ 线性过滤上采样 = 高斯式模糊，blurPower 1→0 交叉淡化
+- **模糊**：低分辨率 RenderTarget（640×360）+ 线性过滤上采样（近似柔化，非真正的高斯模糊），blurPower 1→0 交叉淡化
 
 #### 3. 启动 Logo（BootLogoScreen）
 
