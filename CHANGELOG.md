@@ -1,5 +1,14 @@
 # Changelog
 
+## v1.0.5 — 2026-10-07（CI）
+
+### 新增 CI
+
+`.github/workflows/build.yml`：push / PR 时 `./gradlew build` 并上传 `build/libs/` 产物。
+JDK 17（Gradle 8.8 运行需求）；编译 toolchain 固定 Java 8，由 GTNHConvention 自己的
+toolchain 仓库提供，CI 无需额外 setup。
+此前本分支从未被自动编译验证过。
+
 ## v1.0.5 — 2026-07-31
 
 ### 还原原游戏四项功能（同步 forge-1.20.1 v1.0.5）
