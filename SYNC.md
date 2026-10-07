@@ -121,13 +121,19 @@ Manosaba 的 6 个在维护分支（另有 1 个已归档）是**同一个 GitHu
 | `1.20.1forge` | `.github/workflows/build.yml` | 17（toolchain 17） |
 | `1.21.1neoforge` | `.github/workflows/build.yml` | 21（toolchain 21） |
 | `1.7.10gtnh` | `.github/workflows/build.yml` | 17（Gradle 用；compile toolchain 由 GTNH 插件配） |
-| `1.12.2forge` | `.github/workflows/build.yml` | 17（Gradle 用；compile toolchain 8 / Azul 16 靠 foojay 自动下载） |
+| `1.12.2forge` | `.github/workflows/build.yml` | 25（**必须 25**：RFG 2.0.2 自身是 Java 25 编译的，JDK 17 连插件都加载不了；compile toolchain 8 / Azul 16 靠 foojay 自动下载） |
 | `1.21.10fabric` | `.github/workflows/build.yml` | 25（Fabric MDK 模板原样） |
 | `1.21.11fabric` | `.github/workflows/build.yml` | 25（同上，继承自 1.21.10） |
 
 四支的 toolchain 自动下载都靠 `settings.gradle` 里的
 `org.gradle.toolchains.foojay-resolver-convention`；1.12.2forge 的构建还指定了
 **Azul JDK 16**（`javaCompiler`）和 toolchain 8，CI 首次构建会下载这两个 JDK，比较慢。
+
+**Gradle wrapper 的 `distributionUrl` 不要指向本地文件**。`1.12.2forge` 曾经是
+`file:///tmp/gradle-9.3.1-bin.zip`（初次移植时为绕过 GFW 留下的 workaround），
+后果是 CI 必然失败、且 `/tmp` 被清理后本机也构建不了。现统一用腾讯云镜像
+（`mirrors.cloud.tencent.com/gradle/`，国内直连且 CI 可访问）；换版本时记得确认
+镜像里有对应文件——阿里云镜像并没有 `gradle-9.3.1-bin.zip`。
 
 ---
 
