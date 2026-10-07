@@ -3,6 +3,7 @@ package me.shiiyuko.manosaba.gui.screen;
 import me.shiiyuko.manosaba.Manosaba;
 import me.shiiyuko.manosaba.constant.TextureConst;
 import me.shiiyuko.manosaba.gui.Layer;
+import me.shiiyuko.manosaba.gui.Tickable;
 import me.shiiyuko.manosaba.gui.TitleScreenButton;
 import me.shiiyuko.manosaba.gui.VirtualScreen;
 import me.shiiyuko.manosaba.init.ManosabaSounds;
@@ -21,11 +22,10 @@ import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
 import net.minecraft.client.gui.screens.worldselection.SelectWorldScreen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
-import net.minecraft.client.renderer.texture.Tickable;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.storage.LevelStorageException;
@@ -40,7 +40,7 @@ import java.util.List;
  *   <li>背景图 ContentScale.Crop（2:1→16:9），1.05→1.0 呼吸动画；</li>
  *   <li>TitleOverlay 2560×1440 全屏画框 1:1 填充，延迟淡入；</li>
  *   <li>TitleLogo 位于原 anchoredPosition=(747,381)，原生尺寸；</li>
- *   <li>5 个按钮以中心 X 坐标表 cx[] 定位，附实测微调 normalOx[]（最大 11px）；</li>
+ *   <li>5 个按钮使用原游戏 anchoredPosition + 160px 左移（避免 Exit 被 scissor 裁剪）；</li>
  *   <li>版本号右下角；点击 Exit 弹出二级确认菜单（ExitDialog）。</li>
  * </ul>
  * 动画由 {@link Layer#tick()} 和 {@link TitleScreenButton#tick()} 驱动，
@@ -48,6 +48,11 @@ import java.util.List;
  * <p>
  * 1.21.10 版：渲染全部走 {@link RenderUtils#blit}/{@link RenderUtils#blitCrop}
  * （GUI_TEXTURED pipeline + ARGB alpha），入场模糊已按用户决定跳过。
+ * <p>
+ * 1.21.11 变更：{@code ResourceLocation} → {@link Identifier}；
+ * {@link Tickable} 改为本 mod 自定义接口（原版同名接口已移除）；
+ * {@code SimpleSoundInstance.forMusic} 由 {@code (SoundEvent, float)} 收敛为
+ * 单参 {@code (SoundEvent)}——音高/音量固定为默认值。
  */
 public class ManosabaTitleScreen extends TitleScreen {
 
@@ -119,7 +124,7 @@ public class ManosabaTitleScreen extends TitleScreen {
         // 翻转为 Y-down：(2027, 339)。纹理 1039×622。
         float logoCenterX = 1280 + 747;
         float logoCenterY = 1440 - (720 + 381);
-        ResourceLocation logoTex = isChineseLocale()
+        Identifier logoTex = isChineseLocale()
                 ? TextureConst.TITLE_LOGO_ZH : TextureConst.TITLE_LOGO_JA;
         logoLayer = new Layer(logoTex,
                 logoCenterX - LOGO_W / 2f, logoCenterY - LOGO_H / 2f,
@@ -175,8 +180,8 @@ public class ManosabaTitleScreen extends TitleScreen {
             float x = cx[i] - widths[i] / 2f + normalOx[i];
             float y = (1440 - cy[i]) - heights[i] / 2f + normalOy[i];
 
-            ResourceLocation normal = buttonTexture(name, false);
-            ResourceLocation highlighted = buttonTexture(name, true);
+            Identifier normal = buttonTexture(name, false);
+            Identifier highlighted = buttonTexture(name, true);
             boolean locked = "LoadGame".equals(name) && loadLocked;
             if (locked) {
                 // Locked 态：双态同为锁定纹理 → 无悬停高亮
@@ -202,7 +207,7 @@ public class ManosabaTitleScreen extends TitleScreen {
         }
     }
 
-    private static ResourceLocation buttonTexture(String name, boolean highlighted) {
+    private static Identifier buttonTexture(String name, boolean highlighted) {
         return switch (name) {
             case "LoadGame" -> highlighted ? TextureConst.BUTTON_LOAD_GAME_HIGHLIGHTED
                     : TextureConst.BUTTON_LOAD_GAME_NORMAL;
@@ -223,7 +228,7 @@ public class ManosabaTitleScreen extends TitleScreen {
         return code != null && code.startsWith("zh");
     }
 
-    private static ResourceLocation labelTexture(String name) {
+    private static Identifier labelTexture(String name) {
         return switch (name) {
             case "LoadGame" -> TextureConst.LABEL_LOAD_GAME;
             case "NewGame" -> TextureConst.LABEL_NEW_GAME;
@@ -276,7 +281,7 @@ public class ManosabaTitleScreen extends TitleScreen {
         // 进入世界由 ManosabaClient 的 JOIN 事件停止。
         if (!musicStarted) {
             musicStarted = true;
-            this.titleMusic = SimpleSoundInstance.forMusic(ManosabaSounds.TITLE_MUSIC.value(), 1.0f);
+            this.titleMusic = SimpleSoundInstance.forMusic(ManosabaSounds.TITLE_MUSIC.value());
             Minecraft.getInstance().getSoundManager().play(this.titleMusic);
             Manosaba.titleMusicPlaying = true;
         } else if (this.titleMusic != null

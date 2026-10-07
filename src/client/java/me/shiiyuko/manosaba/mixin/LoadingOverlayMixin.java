@@ -1,11 +1,11 @@
 package me.shiiyuko.manosaba.mixin;
 
 import me.shiiyuko.manosaba.gui.splash.SplashOverlayRenderer;
-import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.LoadingOverlay;
 import net.minecraft.server.packs.resources.ReloadInstance;
+import net.minecraft.util.Util;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -22,7 +22,13 @@ import java.util.function.Consumer;
  *
  * <p>The field names and the {@code -1L} sentinel initialisation of
  * {@code fadeOutStart}/{@code fadeInStart} match the vanilla {@code render()}
- * control flow; the 1.21.10 official mappings keep them unchanged.</p>
+ * control flow.</p>
+ *
+ * <p>1.21.11 校验：{@code LoadingOverlay} 的 {@code minecraft} / {@code reload} /
+ * {@code onFinish} / {@code fadeIn} / {@code fadeOutStart} / {@code fadeInStart}
+ * 六个字段名与 {@code render(GuiGraphics,int,int,float)} 签名均未变。两处 API 调整：
+ * {@code Util} 的包名从 {@code net.minecraft.Util} 移到 {@code net.minecraft.util.Util}；
+ * {@code Screen.resize} 去掉了首参 {@code Minecraft}，只剩 {@code (int, int)}。</p>
  */
 @Mixin(LoadingOverlay.class)
 public abstract class LoadingOverlayMixin {
@@ -89,7 +95,8 @@ public abstract class LoadingOverlayMixin {
                 this.onFinish.accept(Optional.of(throwable));
             }
             if (this.minecraft.screen != null) {
-                this.minecraft.screen.resize(this.minecraft,
+                // 1.21.11：Screen.resize 去掉了 Minecraft 首参，只剩 (int, int)。
+                this.minecraft.screen.resize(
                         Minecraft.getInstance().getWindow().getGuiScaledWidth(),
                         Minecraft.getInstance().getWindow().getGuiScaledHeight());
             }

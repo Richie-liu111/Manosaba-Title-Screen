@@ -2,7 +2,6 @@ package me.shiiyuko.manosaba.gui;
 
 import me.shiiyuko.manosaba.function.AnimationFunction;
 import me.shiiyuko.manosaba.utils.RenderUtils;
-import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Renderable;
@@ -10,10 +9,10 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.input.MouseButtonEvent;
-import net.minecraft.client.renderer.texture.Tickable;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.util.Util;
 
 import java.util.function.Consumer;
 
@@ -21,7 +20,10 @@ import java.util.function.Consumer;
  * 标题画面按钮：两张独立 PNG（Normal/Hover）+ hover 检测 + 点击回调。
  * 坐标在虚拟空间内定义，通过 {@link VirtualScreen} 转换。支持 alpha 淡入动画。
  * 来自 YuZuUI 的 TitleScreenButton，输入事件使用 1.21.9+ 的
- * {@code MouseButtonEvent} 签名。
+ * {@code MouseButtonEvent} 签名（1.21.11 未变）。
+ * <p>
+ * 1.21.11 变更：{@code ResourceLocation} → {@link Identifier}；
+ * {@link Tickable} 改为本 mod 自定义接口；{@code Util} 移到 {@code net.minecraft.util} 包。
  */
 public class TitleScreenButton implements Renderable, GuiEventListener, NarratableEntry, Tickable {
     private float x;
@@ -39,9 +41,9 @@ public class TitleScreenButton implements Renderable, GuiEventListener, Narratab
     private boolean hoverable = true;
     private boolean isHovered = false;
 
-    private ResourceLocation texture;
-    private ResourceLocation textureHover;
-    private ResourceLocation labelTexture;
+    private Identifier texture;
+    private Identifier textureHover;
+    private Identifier labelTexture;
     private float labelWidth;
     private float labelHeight;
     private float labelOffsetX;
@@ -53,7 +55,7 @@ public class TitleScreenButton implements Renderable, GuiEventListener, Narratab
     private SoundEvent clickSound;
 
     public TitleScreenButton(float x, float y, float width, float height,
-                             ResourceLocation texture, ResourceLocation textureHover,
+                             Identifier texture, Identifier textureHover,
                              VirtualScreen virtualScreen, float alpha) {
         this.x = x;
         this.y = y;
@@ -161,7 +163,7 @@ public class TitleScreenButton implements Renderable, GuiEventListener, Narratab
     /** 设置悬停时显示的中文标签精灵（原游戏 Label@ZhHans）。
      *  @param offsetX 标签左上角相对于按钮左上角的 X 偏移
      *  @param offsetY 标签左上角相对于按钮左上角的 Y 偏移 */
-    public void setLabelTexture(ResourceLocation texture, float w, float h, float offsetX, float offsetY) {
+    public void setLabelTexture(Identifier texture, float w, float h, float offsetX, float offsetY) {
         this.labelTexture = texture;
         this.labelWidth = w;
         this.labelHeight = h;
@@ -191,7 +193,7 @@ public class TitleScreenButton implements Renderable, GuiEventListener, Narratab
 
     @Override
     public void tick() {
-        if (delay == null || duration == null || duration == 0L) {
+        if (delay == null || duration == 0) {
             return;
         }
 

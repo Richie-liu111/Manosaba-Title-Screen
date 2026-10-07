@@ -4,7 +4,7 @@ import me.shiiyuko.manosaba.Manosaba;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 
 /**
@@ -12,6 +12,9 @@ import net.minecraft.sounds.SoundEvent;
  * 静态字段初始化即完成注册；{@link #register()} 仅用于显式触发类加载。
  * 字段类型为 {@link Holder}——需要 {@link SoundEvent} 时用 {@code .value()}，
  * {@link net.minecraft.sounds.Music} 等接受 Holder 的场合可直接传。
+ * <p>
+ * 1.21.11 变更：{@code ResourceLocation} → {@link Identifier}
+ * （{@code Registry.registerForHolder} 的签名形状未变）。
  */
 public final class ManosabaSounds {
 
@@ -31,7 +34,7 @@ public final class ManosabaSounds {
     }
 
     private static Holder<SoundEvent> register(String name) {
-        ResourceLocation id = ResourceLocation.fromNamespaceAndPath(Manosaba.MODID, name);
+        Identifier id = Identifier.fromNamespaceAndPath(Manosaba.MODID, name);
         return Registry.registerForHolder(BuiltInRegistries.SOUND_EVENT, id,
                 SoundEvent.createVariableRangeEvent(id));
     }

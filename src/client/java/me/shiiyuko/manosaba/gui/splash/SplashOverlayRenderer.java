@@ -17,6 +17,8 @@ import net.minecraft.util.Mth;
  *   <li>整体 alpha 由 {@code LoadingOverlayMixin} 根据淡入淡出时序传入。</li>
  * </ul>
  * 单例，{@link #cleanup()} 后重置。
+ * <p>
+ * 1.21.11 无需改动（只经由 {@link RenderUtils} 与 {@link TextureConst} 间接使用纹理标识）。
  */
 public final class SplashOverlayRenderer {
 

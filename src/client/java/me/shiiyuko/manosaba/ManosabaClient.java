@@ -23,6 +23,6 @@ public class ManosabaClient implements ClientModInitializer {
             Minecraft.getInstance().getSoundManager().stop();
         });
 
-        Manosaba.LOGGER.info("Manosaba title screen loaded (Fabric 1.21.10).");
+        Manosaba.LOGGER.info("Manosaba title screen loaded (Fabric 1.21.11).");
     }
 }

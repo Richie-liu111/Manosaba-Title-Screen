@@ -11,6 +11,7 @@ import java.util.List;
 
 /**
  * 暴露 {@link Screen} 的私有组件列表（renderables 供自定义渲染循环按序遍历）。
+ * 1.21.11 中三个字段名与 {@code Screen} 的可见性均未变。
  */
 @Mixin(Screen.class)
 public interface ScreenMixin {

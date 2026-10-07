@@ -19,6 +19,10 @@ import org.spongepowered.asm.mixin.injection.Redirect;
  * 不需要绕过 static final 限制，跨版本/跨加载器兼容性更好。
  * 注意 1.21.10 中字段已改名为 {@code Musics.MENU}（旧 MUSIC_MENU），
  * 但本 mixin 只比对 {@link SoundEvents#MUSIC_MENU} 常量，不受影响。
+ * <p>
+ * 1.21.11 校验：{@code Musics.MENU} 仍存在，{@code Music} 仍是
+ * {@code (Holder<SoundEvent>, int, int, boolean)} 四参 record 构造，
+ * 本 mixin 的 target 描述符无需改动。
  */
 @Mixin(Musics.class)
 public abstract class MusicsMixin {

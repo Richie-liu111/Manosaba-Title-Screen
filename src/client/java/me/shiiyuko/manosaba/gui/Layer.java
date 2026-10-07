@@ -2,20 +2,23 @@ package me.shiiyuko.manosaba.gui;
 
 import me.shiiyuko.manosaba.function.AnimationFunction;
 import me.shiiyuko.manosaba.utils.RenderUtils;
-import net.minecraft.Util;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Renderable;
-import net.minecraft.client.renderer.texture.Tickable;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.Util;
 
 /**
  * 单个图层：一张完整 PNG + 位置 + 缩放 + alpha + 可选的缓动动画。
  * 渲染时调用 {@link RenderUtils#blit} 画整张纹理（UV 0~1），坐标通过
  * {@link VirtualScreen} 从虚拟空间转换到实际屏幕空间。
  * 来自 YuZuUI 的 Layer，动画系统支持 x/y/alpha/scale 四个维度的缓动。
+ * <p>
+ * 1.21.11 变更：{@code ResourceLocation} → {@link Identifier}；
+ * {@link Tickable} 由原版接口改为本 mod 自定义（原版同名接口已移除）；
+ * {@code Util} 移到 {@code net.minecraft.util} 包。
  */
 public class Layer implements Renderable, Tickable {
-    private ResourceLocation texture;
+    private Identifier texture;
 
     private float x;
     private float y;
@@ -30,7 +33,7 @@ public class Layer implements Renderable, Tickable {
     public Layer() {
     }
 
-    public Layer(ResourceLocation texture, float x, float y, float width, float height,
+    public Layer(Identifier texture, float x, float y, float width, float height,
                  float scale, float alpha, VirtualScreen virtualScreen) {
         this.texture = texture;
         this.x = x;
@@ -52,11 +55,11 @@ public class Layer implements Renderable, Tickable {
                 alpha);
     }
 
-    public ResourceLocation getTexture() {
+    public Identifier getTexture() {
         return texture;
     }
 
-    public void setTexture(ResourceLocation texture) {
+    public void setTexture(Identifier texture) {
         this.texture = texture;
     }
 
@@ -129,7 +132,7 @@ public class Layer implements Renderable, Tickable {
 
     @Override
     public void tick() {
-        if (delay == null || duration == null || duration == 0L) {
+        if (delay == null || duration == 0) {
             return;
         }
 

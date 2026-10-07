@@ -1,8 +1,8 @@
-# Manosaba Title Screen (Fabric 1.21.10)
+# Manosaba Title Screen (Fabric 1.21.11)
 
-一个 Minecraft Fabric 1.21.10 纯客户端模组，用于自定义标题屏幕和启动画面，灵感来源于游戏《魔法少女ノ魔女裁判》。
+一个 Minecraft Fabric 1.21.11 纯客户端模组，用于自定义标题屏幕和启动画面，灵感来源于游戏《魔法少女ノ魔女裁判》。
 
-这是 [Manosaba-Title-Screen](https://github.com/Richie-liu111/Manosaba-Title-Screen) 仓库的 **Fabric 1.21.10** 分支，源码移植自同仓库 `1.20.1forge` 分支（v1.0.5）。渲染层基于 1.21.10 的 blaze3d GPU 流水线重写（`GuiGraphics.blit(RenderPipelines.GUI_TEXTURED, ...)`，不再使用已移除的 `RenderSystem.setShader*` 立即模式 API）。
+这是 [Manosaba-Title-Screen](https://github.com/Richie-liu111/Manosaba-Title-Screen) 仓库的 **Fabric 1.21.11** 分支，源码移植自同仓库 `1.21.10fabric` 分支（v1.0.5）。渲染层沿用 1.21.10 的 blaze3d GPU 流水线（`GuiGraphics.blit(RenderPipelines.GUI_TEXTURED, ...)`），1.21.11 只需适配少数改名/收敛的 API（见下）。
 
 ## 功能
 
@@ -27,19 +27,36 @@
 | Options | 打开设置界面（`OptionsScreen`） |
 | Exit | 打开退出确认对话框 → 确认后退出游戏 |
 
-## 与原版 v1.0.5（Forge 1.20.1）的差异
+## 与 1.21.10 分支的差异（1.21.11 API 适配）
 
-- **去掉配置功能**：固定 HIRO 背景，删除 ManosabaConfig / ManosabaConfigScreen
-- **跳过入场模糊**：删除 640×360 FBO 离屏模糊，背景保留 EaseOutQuad 缩放动画
-- **logo 只播一次**：高版本原版加载界面已原生显示开发者 logo，删除 `BootLogoScreen`，发行商/开发商 logo 仅在加载界面播放一次（详见 CHANGELOG）
+移植时逐项用 `javap` 对照 1.21.11 的 remap 产物校验，实际需要改动的只有 5 处：
+
+| # | 1.21.10 | 1.21.11 | 影响文件 |
+|---|---------|---------|----------|
+| 1 | `net.minecraft.resources.ResourceLocation` | `net.minecraft.resources.Identifier` | `TextureConst` / `Layer` / `TitleScreenButton` / `ManosabaSounds` / `RenderUtils` / `ManosabaTitleScreen` |
+| 2 | `net.minecraft.Util` | `net.minecraft.util.Util`（换包） | `Layer` / `TitleScreenButton` / `ExitDialog` / `LoadingOverlayMixin` |
+| 3 | `net.minecraft.client.renderer.texture.Tickable` | **接口被移除** → 自建 `me.shiiyuko.manosaba.gui.Tickable` | `Layer` / `TitleScreenButton` / `ManosabaTitleScreen` |
+| 4 | `SimpleSoundInstance.forMusic(SoundEvent, float)` | `forMusic(SoundEvent)`（单参） | `ManosabaTitleScreen` |
+| 5 | `Screen.resize(Minecraft, int, int)` | `Screen.resize(int, int)`（去首参） | `LoadingOverlayMixin` |
+
+**逐项运行时校验（编译期查不出 mixin 目标失配，均已手动核对字节码）：**
+
+- `MinecraftMixin` — `Minecraft.setScreen` 偏移 80 处仍是 `new TitleScreen()` / `invokespecial TitleScreen.<init>()V`；
+  1.21.11 新增的 `setScreenAndShow(Screen)` 内部只是 `setScreen` + `runTick(false)`，不构成绕过路径。
+- `MusicsMixin` — `Musics.<clinit>` 仍是 `MUSIC_MENU` → `new Music(Holder,int,int,boolean)` → `MENU`，`@Redirect` 描述符未变。
+- `ScreenMixin` — `Screen` 的 `renderables` / `children` / `narratables` 三字段名与可见性未变。
+- `MusicTickerMixin` — `MusicManager.tick()` 与 public 的 `Minecraft.screen` 未变。
+- `LoadingOverlayMixin` — `minecraft` / `reload` / `onFinish` / `fadeIn` / `fadeOutStart` / `fadeInStart` 六字段名与
+  `render(GuiGraphics,int,int,float)` 签名未变。
+- `RenderPipelines.GUI_TEXTURED` 与用到的两个 `GuiGraphics.blit` 重载（11 参 / 13 参）**签名未变**，渲染层逻辑零改动。
 
 ## 构建与运行
 
 ### 环境要求
 
 - JDK 21
-- Minecraft 1.21.10
-- Fabric Loader 0.19.3+ / Fabric API 0.138.4+
+- Minecraft 1.21.11
+- Fabric Loader 0.19.5+ / Fabric API 0.141.6+1.21.11
 
 ### 构建
 

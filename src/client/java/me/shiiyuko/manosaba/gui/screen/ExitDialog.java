@@ -7,12 +7,12 @@ import me.shiiyuko.manosaba.gui.TitleScreenButton;
 import me.shiiyuko.manosaba.gui.VirtualScreen;
 import me.shiiyuko.manosaba.init.ManosabaSounds;
 import me.shiiyuko.manosaba.utils.RenderUtils;
-import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.util.Util;
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 
@@ -35,6 +35,9 @@ import org.slf4j.Logger;
  * <p><b>音效</b>：取消 = Sfx_System_Cancel_001，结束 = Sfx_System_Submit_001（确认后播放）。
  * <b>退出时序</b>（原游戏 # QuitGame）：停 BGM → 提交音效 → 关闭对话框 150ms
  * → 黑幕 1.2s 淡入 → 退出游戏。
+ *
+ * <p>1.21.11 变更：仅 {@code Util} 的包名从 {@code net.minecraft.Util}
+ * 移到 {@code net.minecraft.util.Util}。
  */
 public class ExitDialog {
 

@@ -3,7 +3,7 @@
 	"id": "manosaba",
 	"version": "${version}",
 	"name": "Manosaba Title Screen",
-	"description": "Manosaba title screen port (Fabric 1.21.10).\nOriginal Fabric mod by Shiiyuko.",
+	"description": "Manosaba title screen port (Fabric 1.21.11).\nOriginal Fabric mod by Shiiyuko.",
 	"authors": [
 		"Shiiyuko",
 		"Richie-liu111"
@@ -26,8 +26,8 @@
 		}
 	],
 	"depends": {
-		"fabricloader": ">=0.19.3",
-		"minecraft": "~1.21.10",
+		"fabricloader": ">=0.19.5",
+		"minecraft": "~1.21.11",
 		"java": ">=21",
 		"fabric-api": "*"
 	},

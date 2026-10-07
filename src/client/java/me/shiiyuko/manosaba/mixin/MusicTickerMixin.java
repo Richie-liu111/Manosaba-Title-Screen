@@ -19,6 +19,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  *   <li>标题屏已在 LoadingOverlay 淡出前被 setScreen、但其 BGM 尚未启动的窗口
  *       （overlay 非空）：阻止 MusicManager 在此阶段起播原版菜单音乐。</li>
  * </ol>
+ * 1.21.11 校验：{@code MusicManager.tick()} 与 public 的 {@code Minecraft.screen}
+ * 字段均未变。
  */
 @Mixin(MusicManager.class)
 public class MusicTickerMixin {

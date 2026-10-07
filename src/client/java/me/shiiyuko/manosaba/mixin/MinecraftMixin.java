@@ -22,6 +22,11 @@ import org.spongepowered.asm.mixin.injection.Redirect;
  *       {@code new TitleScreen()}，防止某些代码路径（如读取存档→无存档→
  *       创建世界→返回）的 TitleScreen 实例不经过参数传递而漏网。</li>
  * </ol>
+ * <p>
+ * 1.21.11 校验：{@code Minecraft.setScreen} 字节码中偏移 80 处仍为
+ * {@code new TitleScreen()} / {@code invokespecial TitleScreen.<init>()V}，
+ * 两个注入点均有效。1.21.11 新增的 {@code setScreenAndShow(Screen)} 内部只是
+ * 调用 {@code setScreen} 后再 {@code runTick(false)}，因此不构成绕过路径。
  */
 @Mixin(Minecraft.class)
 public abstract class MinecraftMixin {
