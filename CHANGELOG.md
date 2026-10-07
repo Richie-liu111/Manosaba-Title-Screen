@@ -2,6 +2,28 @@
 
 ## v1.0.5 — 2026-10-07（包名对齐 + CI + 交互修复）
 
+### 修复：Gradle wrapper 指向本机文件，CI 无法构建
+
+`gradle/wrapper/gradle-wrapper.properties` 里的 `distributionUrl` 一直指向
+`file:///tmp/gradle-9.3.1-bin.zip`——一个只在作者本机存在的路径（初次移植时
+为绕过 GFW 下载失败而留下的 workaround，随初始提交进了仓库）。
+
+后果有两个，第二个当时没被察觉：
+
+1. GitHub Actions 上不存在这个文件，CI 必然失败（首次启用 CI 即暴露）；
+2. 本机 `/tmp` 会被系统清理，该文件其实**已经不存在**了——之前能构建只是因为
+   Gradle 早先把它解压进了 `~/.gradle/wrapper/dists/` 缓存，一旦缓存失效就再也构建不了。
+
+改为腾讯云镜像（与 `1.21.1neoforge` 分支一致，该分支 CI 已验证可访问）：
+
+```properties
+distributionUrl=https\://mirrors.cloud.tencent.com/gradle/gradle-9.3.1-bin.zip
+validateDistributionUrl=true
+```
+
+`README.md` 的 GFW 段一并更正——原先推荐的阿里云地址
+`mirrors.aliyun.com/gradle/gradle-9.3.1-bin.zip` 实测是 **404**。
+
 ### 修复：原版按钮看不见却仍可交互
 
 **症状**：标题界面上点空白处会误触发原版动作——点到原版「单人游戏」的位置就打开世界选择，

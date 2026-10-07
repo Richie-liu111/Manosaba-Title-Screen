@@ -50,14 +50,17 @@
 
 ### GFW 注意事项
 
-如果 Gradle wrapper 无法从 `services.gradle.org` 下载（SSL 证书错误），编辑 `gradle/wrapper/gradle-wrapper.properties`：
+`gradle-wrapper.properties` 里的 `distributionUrl` 已经指向腾讯云镜像
+（与 `1.21.1neoforge` 分支一致），国内直连可用，CI 上也能访问：
 
 ```properties
-distributionUrl=https\://mirrors.aliyun.com/gradle/gradle-9.3.1-bin.zip
-validateDistributionUrl=false
+distributionUrl=https\://mirrors.cloud.tencent.com/gradle/gradle-9.3.1-bin.zip
+validateDistributionUrl=true
 ```
 
-或手动下载 Gradle 9.3.1 后配置 `file://` 本地 URL。
+> **不要**改回 `file://` 本地路径：这样会在本地跑通而在 CI 上失败
+> （runner 上没有那个文件），且 `/tmp` 会被系统清理，随时可能连本地也失效。
+> 阿里云镜像没有 `gradle-9.3.1-bin.zip`（404），不要照抄旧文档里的地址。
 
 ## 架构
 
