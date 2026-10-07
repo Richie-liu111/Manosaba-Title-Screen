@@ -3,6 +3,23 @@
 本 mod 为 Manosaba 标题屏替换 mod（灵感来自《魔法少女ノ魔女裁判》）的 **Fabric 1.21.10** 移植版。
 源码移植自 `forge1.20.1`（v1.0.5），纯客户端 mod。
 
+## [1.0.5-fabric+config] - 2026-10-07
+
+### 配置界面与 Mod Menu 集成
+
+- **恢复配置功能**：新增 `config/ManosabaConfig`，用 Gson 持久化到 `config/manosaba.json`，
+  目前仅一项 `backgroundCharacter`（`HIRO` / `EMA`，默认 `HIRO`）。Fabric 侧没有 Forge 的
+  `ModConfigSpec`，故手写读写；文件不存在或损坏时静默退回默认值，不打断启动。
+- **新增配置界面** `config/ManosabaConfigScreen`，内容与 Forge / NeoForge 版逐字一致
+  （切换背景角色按钮 + 完成按钮）。
+- **Mod Menu 集成**：新增 `compat/ManosabaModMenu`，实现 `ModMenuApi#getModConfigScreenFactory`，
+  在 Mod Menu（https://github.com/TerraformersMC/ModMenu）的模组列表里为本模组提供「配置」按钮。
+- **依赖策略**：Mod Menu 用 `modCompileOnly` + `modLocalRuntime`（`modmenu_version=16.0.1`，
+  对应 MC 1.21.9–1.21.10）。未安装 Mod Menu 时 Fabric 不会请求 `"modmenu"` 这组 entrypoint，
+  兼容类不会被加载，本模组对 Mod Menu **无硬依赖**（`fabric.mod.json` 里声明为 `suggests`）。
+- `TextureConst.background()` 恢复 HIRO / EMA 切换（`background_ema.png` 本就在资源里）。
+- `build.gradle` 新增 TerraformersMC maven 仓库。
+
 ## [1.0.5-fabric] - 2026-08-08
 
 ### 移植（Fabric 1.21.10 / Loom 1.17 / Java 21 / Mojang mappings）
@@ -20,8 +37,6 @@
 
 ### 与原版 v1.0.5 的差异
 
-- **去掉配置功能**：固定 HIRO 背景（`TextureConst.background()` 恒返回 `background_hiro`），
-  删除 ManosabaConfig / ManosabaConfigScreen。
 - **跳过入场模糊**：删除 640×360 FBO 离屏模糊，背景保留 EaseOutQuad 缩放动画（2700ms）。
 
 ### 修复（问题排查后）

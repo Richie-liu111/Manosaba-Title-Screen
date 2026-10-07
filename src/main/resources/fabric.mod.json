@@ -14,6 +14,9 @@
 	"entrypoints": {
 		"client": [
 			"me.shiiyuko.manosaba.ManosabaClient"
+		],
+		"modmenu": [
+			"me.shiiyuko.manosaba.compat.ManosabaModMenu"
 		]
 	},
 	"mixins": [
@@ -27,5 +30,8 @@
 		"minecraft": "~1.21.10",
 		"java": ">=21",
 		"fabric-api": "*"
+	},
+	"suggests": {
+		"modmenu": "*"
 	}
 }

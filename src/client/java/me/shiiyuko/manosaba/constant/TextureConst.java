@@ -1,6 +1,7 @@
 package me.shiiyuko.manosaba.constant;
 
 import me.shiiyuko.manosaba.Manosaba;
+import me.shiiyuko.manosaba.config.ManosabaConfig;
 import net.minecraft.resources.ResourceLocation;
 
 /**
@@ -17,11 +18,13 @@ public final class TextureConst {
         return ResourceLocation.fromNamespaceAndPath(Manosaba.MODID, "textures/gui/" + name + ".png");
     }
 
-    // 背景固定 HIRO（Fabric 版已去掉配置功能，不再支持 HIRO/EMA 切换）
+    // 背景（通过 config/manosaba.json 切换 HIRO/EMA，默认 HIRO）
     public static final ResourceLocation BACKGROUND_HIRO = ui("background_hiro");
+    public static final ResourceLocation BACKGROUND_EMA = ui("background_ema");
 
     public static ResourceLocation background() {
-        return BACKGROUND_HIRO;
+        return ManosabaConfig.backgroundCharacter() == ManosabaConfig.BackgroundCharacter.EMA
+                ? BACKGROUND_EMA : BACKGROUND_HIRO;
     }
 
     public static final ResourceLocation TITLE_OVERLAY = ui("titleoverlay");

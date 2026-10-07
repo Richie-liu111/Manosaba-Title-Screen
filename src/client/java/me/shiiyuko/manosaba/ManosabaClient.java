@@ -1,5 +1,6 @@
 package me.shiiyuko.manosaba;
 
+import me.shiiyuko.manosaba.config.ManosabaConfig;
 import me.shiiyuko.manosaba.init.ManosabaSounds;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
@@ -13,6 +14,7 @@ public class ManosabaClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
+        ManosabaConfig.load();
         ManosabaSounds.register();
 
         // 进入世界：停止标题 BGM，MusicManager 恢复游戏音乐。
