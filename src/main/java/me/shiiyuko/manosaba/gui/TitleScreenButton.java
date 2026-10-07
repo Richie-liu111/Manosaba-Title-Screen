@@ -119,7 +119,7 @@ public class TitleScreenButton {
     }
 
     public void tick() {
-        if (delay == null || duration == 0) return;
+        if (delay == null || duration == null || duration == 0L) return;
         long currentTime = System.currentTimeMillis();
         if (startTime == null) {
             startTime = currentTime;

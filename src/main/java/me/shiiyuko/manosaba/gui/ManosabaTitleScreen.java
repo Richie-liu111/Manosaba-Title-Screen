@@ -418,7 +418,7 @@ public class ManosabaTitleScreen extends GuiScreen {
 
     /**
      * 入场模糊：把背景画进低分辨率 FBO（640×360），再以线性过滤上采样回屏幕，
-     * alpha = blurPower 覆盖在清晰版上。低分辨率 + 线性插值放大 = 平滑高斯式模糊。
+     * alpha = blurPower 覆盖在清晰版上。低分辨率 + 线性插值放大 = 近似柔化（双线性上采样，非真正的高斯模糊）。
      */
     private void renderBlurredBackground(float blurPower,
                                          int scissorX, int scissorY, int scissorW, int scissorH) {

@@ -59,7 +59,7 @@ public class Layer {
     }
 
     public void tick() {
-        if (delay == null || duration == 0) {
+        if (delay == null || duration == null || duration == 0L) {
             return;
         }
 
