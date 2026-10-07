@@ -1,4 +1,4 @@
-package com.paulzzh.yuzu.init;
+package me.shiiyuko.manosaba.init;
 
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;

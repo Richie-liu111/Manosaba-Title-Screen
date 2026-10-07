@@ -1,4 +1,4 @@
-package com.img.gui;
+package me.shiiyuko.manosaba.gui;
 
 /**
  * 虚拟画布：将设计空间（如 1920×1080）的坐标等比映射到实际屏幕坐标，

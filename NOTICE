@@ -31,11 +31,11 @@ Manosaba Title Screen — NOTICE
 
 本分支中的派生文件（路径相对 src/main/java/）：
 
-   com/img/gui/Layer.java
-   com/img/gui/VirtualScreen.java
-   com/img/gui/TitleScreenButton.java
-   com/img/function/AnimationFunction.java
-   com/paulzzh/yuzu/gui/RenderUtils.java
+   me/shiiyuko/manosaba/gui/Layer.java
+   me/shiiyuko/manosaba/gui/VirtualScreen.java
+   me/shiiyuko/manosaba/gui/TitleScreenButton.java
+   me/shiiyuko/manosaba/function/AnimationFunction.java
+   me/shiiyuko/manosaba/gui/RenderUtils.java
 
 
 2. 魔法少女ノ魔女裁判（Magical Girl × Witch Trial）游戏素材

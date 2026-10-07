@@ -1,4 +1,4 @@
-package com.paulzzh.yuzu;
+package me.shiiyuko.manosaba;
 
 import zone.rong.mixinbooter.IEarlyMixinLoader;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;

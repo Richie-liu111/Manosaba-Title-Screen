@@ -1,0 +1,36 @@
+# Automatically build the project and run any configured tests for every push
+# and submitted pull request. This can help catch issues that only occur on
+# certain platforms or Java versions, and provides a first line of defence
+# against bad commits.
+
+name: build
+on: [pull_request, push, workflow_dispatch]
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v6
+      - name: validate gradle wrapper
+        uses: gradle/actions/wrapper-validation@v6
+      # Gradle 9.3.1 needs JDK 17+ to run. The compile side needs two more
+      # JDKs — a Java 8 toolchain (java.toolchain) and Azul JDK 16
+      # (javaCompiler in tasks.withType(JavaCompile)) — which Gradle
+      # auto-provisions via the foojay resolver in settings.gradle.
+      # Expect the first CI run to be slow: it downloads all three JDKs
+      # plus the Minecraft 1.12.2 / MCP artefacts.
+      - name: setup jdk
+        uses: actions/setup-java@v5
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+      - name: make gradle wrapper executable
+        run: chmod +x ./gradlew
+      - name: build
+        run: ./gradlew build
+      - name: capture build artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: Artifacts
+          path: build/libs/

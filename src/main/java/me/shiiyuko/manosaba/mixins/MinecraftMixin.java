@@ -1,6 +1,6 @@
-package com.paulzzh.yuzu.mixins;
+package me.shiiyuko.manosaba.mixins;
 
-import com.paulzzh.yuzu.Manosaba;
+import me.shiiyuko.manosaba.Manosaba;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.ISound;
 import net.minecraft.client.audio.MusicTicker;

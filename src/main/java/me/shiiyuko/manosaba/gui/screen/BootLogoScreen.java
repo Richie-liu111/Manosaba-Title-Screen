@@ -1,8 +1,8 @@
-package com.paulzzh.yuzu.gui.screen;
+package me.shiiyuko.manosaba.gui.screen;
 
-import com.img.gui.VirtualScreen;
-import com.paulzzh.yuzu.Manosaba;
-import com.paulzzh.yuzu.constant.TextureConst;
+import me.shiiyuko.manosaba.gui.VirtualScreen;
+import me.shiiyuko.manosaba.Manosaba;
+import me.shiiyuko.manosaba.constant.TextureConst;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;

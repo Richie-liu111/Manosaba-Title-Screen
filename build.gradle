@@ -73,7 +73,7 @@ processResources {
 
 jar {
     manifest {
-        attributes 'FMLCorePlugin': 'com.paulzzh.yuzu.ManosabaCore'
+        attributes 'FMLCorePlugin': 'me.shiiyuko.manosaba.ManosabaCore'
         attributes 'FMLCorePluginContainsFMLMod': true
     }
 }

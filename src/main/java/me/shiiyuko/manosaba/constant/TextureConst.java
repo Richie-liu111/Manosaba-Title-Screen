@@ -1,4 +1,4 @@
-package com.paulzzh.yuzu.constant;
+package me.shiiyuko.manosaba.constant;
 
 import net.minecraft.util.ResourceLocation;
 
@@ -20,8 +20,8 @@ public final class TextureConst {
 
     // 背景（通过 ManosabaConfig 切换 HIRO/EMA，默认 HIRO）
     public static ResourceLocation background() {
-        return com.paulzzh.yuzu.config.ManosabaConfig.getBackground()
-                == com.paulzzh.yuzu.config.ManosabaConfig.BackgroundCharacter.EMA
+        return me.shiiyuko.manosaba.config.ManosabaConfig.getBackground()
+                == me.shiiyuko.manosaba.config.ManosabaConfig.BackgroundCharacter.EMA
                 ? ui("background_ema") : ui("background_hiro");
     }
     public static final ResourceLocation TITLE_OVERLAY = ui("titleoverlay");

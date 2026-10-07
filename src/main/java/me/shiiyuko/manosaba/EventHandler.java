@@ -1,7 +1,7 @@
-package com.paulzzh.yuzu;
+package me.shiiyuko.manosaba;
 
-import com.paulzzh.yuzu.gui.screen.BootLogoScreen;
-import com.paulzzh.yuzu.gui.screen.ManosabaTitleScreen;
+import me.shiiyuko.manosaba.gui.screen.BootLogoScreen;
+import me.shiiyuko.manosaba.gui.screen.ManosabaTitleScreen;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraftforge.client.event.GuiOpenEvent;

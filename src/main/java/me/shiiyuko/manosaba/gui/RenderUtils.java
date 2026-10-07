@@ -1,6 +1,6 @@
-package com.paulzzh.yuzu.gui;
+package me.shiiyuko.manosaba.gui;
 
-import com.img.gui.VirtualScreen;
+import me.shiiyuko.manosaba.gui.VirtualScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.BufferBuilder;

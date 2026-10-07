@@ -1,7 +1,7 @@
-package com.img.gui;
+package me.shiiyuko.manosaba.gui;
 
-import com.img.function.AnimationFunction;
-import com.paulzzh.yuzu.gui.RenderUtils;
+import me.shiiyuko.manosaba.function.AnimationFunction;
+import me.shiiyuko.manosaba.gui.RenderUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.renderer.GlStateManager;

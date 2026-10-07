@@ -1,7 +1,7 @@
-package com.paulzzh.yuzu;
+package me.shiiyuko.manosaba;
 
-import com.paulzzh.yuzu.config.ManosabaConfig;
-import com.paulzzh.yuzu.init.ManosabaSounds;
+import me.shiiyuko.manosaba.config.ManosabaConfig;
+import me.shiiyuko.manosaba.init.ManosabaSounds;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -13,7 +13,7 @@ import org.apache.logging.log4j.Logger;
         version = Manosaba.VERSION,
         clientSideOnly = true,
         acceptableRemoteVersions = "*",
-        guiFactory = "com.paulzzh.yuzu.config.ManosabaConfigGuiFactory"
+        guiFactory = "me.shiiyuko.manosaba.config.ManosabaConfigGuiFactory"
 )
 public class Manosaba {
     public static final String MODID = "manosaba";

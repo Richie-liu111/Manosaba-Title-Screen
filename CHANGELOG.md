@@ -1,5 +1,58 @@
 # Changelog
 
+## v1.0.5 — 2026-10-07（包名对齐 + CI + 交互修复）
+
+### 修复：原版按钮看不见却仍可交互
+
+**症状**：标题界面上点空白处会误触发原版动作——点到原版「单人游戏」的位置就打开世界选择，
+点到「退出」的位置就退出游戏。界面本身渲染正常，所以只有实际点击才会发现。
+
+**根因**（本分支独有，1.7.10 / 1.20.1 / 1.21.x / Fabric 均无此问题）：
+
+- `ManosabaTitleScreen extends GuiMainMenu`，而 `initGui()` 调了 `super.initGui()`，
+  `GuiMainMenu.initGui()` 会往 `buttonList` 里塞入原版的
+  单人/多人/选项/退出/语言按钮（还有 Forge 的 mods 按钮）；
+- `drawScreen()` 被整个覆写且**不调 `super.drawScreen()`** → 那些按钮不被绘制，看不见；
+- 但 `GuiScreen` 的交互是按 `buttonList` 分发的：`mouseClicked()` 末尾的
+  `super.mouseClicked()` 会遍历它，命中后播按键音并调 `actionPerformed()`。
+  键盘也一样——Tab 始终能聚焦到这些隐形按钮，回车即可触发。
+
+**修法**：在 `super.initGui()` 之后加 `this.buttonList.clear();`。
+比"不调 `super.mouseClicked()`"更彻底——后者拦不住键盘路径。
+`GuiScreen.setWorldAndResolution` 会先清空 `buttonList` 再调 `initGui()`，
+所以这里清掉的正好只是 `GuiMainMenu` 刚加进去的那批。
+
+### 新增 CI
+
+`.github/workflows/build.yml`：push / PR 时 `./gradlew build` 并上传 `build/libs/` 产物。
+JDK 17（Gradle 9.3.1 运行需求）；编译侧还需要 Java 8 toolchain 与 Azul JDK 16
+（`javaCompiler`），由 `settings.gradle` 的 foojay resolver 自动下载——**首次 CI 会比较慢**。
+此前本分支从未被自动编译验证过。
+
+### 包名迁移：`com.paulzzh.yuzu.*` / `com.img.*` → `me.shiiyuko.manosaba.*`
+
+本分支是唯一未与其他 4 支对齐包名的分支，现统一到 `me.shiiyuko.manosaba`：
+
+| 原包 | 新包 | 文件数 |
+|---|---|---|
+| `com.paulzzh.yuzu.*` | `me.shiiyuko.manosaba.*` | 13 |
+| `com.img.gui` | `me.shiiyuko.manosaba.gui` | 3（Layer / TitleScreenButton / VirtualScreen） |
+| `com.img.function` | `me.shiiyuko.manosaba.function` | 1（AnimationFunction） |
+
+用 `git mv` 移动，git 识别为 rename，历史保留。
+
+**除 `package` / `import` 外，另有 4 处「字符串形式的类名」必须同步改**——编译器不报错，漏掉即运行时崩：
+
+- `build.gradle` — `FMLCorePlugin` manifest 属性的 `ManosabaCore` 全限定名（coremod 加载入口）
+- `gradle.properties` — `root_package`（被 `build.gradle` 的 `group =` 读取，也用于 `-ea:` 断言参数）
+- `src/main/resources/mixins.manosaba.json` — `"package"` 字段
+- `Manosaba.java` — `@Mod(guiFactory = "...")` 注解里的 `ManosabaConfigGuiFactory` 全限定名
+
+另有 `TextureConst.java` 使用内联全限定名（非 import），一并更新。`NOTICE` 与 `README.md` 中的派生文件路径 / 三层架构说明同步改写。
+
+已验证：`./gradlew build` 通过；refmap 重新生成且键名为新包名；产出 jar 的 manifest 为 `FMLCorePlugin: me.shiiyuko.manosaba.ManosabaCore`，类全部位于 `me/shiiyuko/manosaba/**`。
+**仍需 `runClient` 验证**：MixinBooter 在运行时按新包名加载 `mixins.manosaba.json` 并应用两个 mixin。
+
 ## v1.0.5 — 2026-07-31
 
 ### 还原原游戏四项功能（同步 forge-1.20.1 + gtnh-1.7.10）

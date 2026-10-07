@@ -1,10 +1,10 @@
-package com.paulzzh.yuzu.gui.screen;
+package me.shiiyuko.manosaba.gui.screen;
 
-import com.img.gui.Layer;
-import com.img.gui.TitleScreenButton;
-import com.img.gui.VirtualScreen;
-import com.paulzzh.yuzu.constant.TextureConst;
-import com.paulzzh.yuzu.init.ManosabaSounds;
+import me.shiiyuko.manosaba.gui.Layer;
+import me.shiiyuko.manosaba.gui.TitleScreenButton;
+import me.shiiyuko.manosaba.gui.VirtualScreen;
+import me.shiiyuko.manosaba.constant.TextureConst;
+import me.shiiyuko.manosaba.init.ManosabaSounds;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.ISound;
 import net.minecraft.client.audio.PositionedSoundRecord;
@@ -84,6 +84,14 @@ public class ManosabaTitleScreen extends GuiMainMenu {
     @Override
     public void initGui() {
         super.initGui();
+
+        // 本界面完全自绘，不用 GuiMainMenu 的原版按钮；但 GuiScreen 是按
+        // buttonList 分发交互的，而 GuiMainMenu.initGui() 已经往里塞了原版的
+        // 单人/多人/选项/退出/语言按钮。drawScreen 被我们整个覆写（不调 super），
+        // 所以那些按钮不会被画出来，却仍会被 mouseClicked 命中——点到空白处
+        // 就会误触发原版动作。清空即可。
+        this.buttonList.clear();
+
         boolean reShow = !firstInit && width == prevW && height == prevH;
         prevW = width;
         prevH = height;

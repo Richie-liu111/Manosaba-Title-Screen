@@ -1,4 +1,4 @@
-package com.paulzzh.yuzu.config;
+package me.shiiyuko.manosaba.config;
 
 import net.minecraftforge.common.config.Configuration;
 

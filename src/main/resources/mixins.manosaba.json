@@ -1,5 +1,5 @@
 {
-    "package": "com.paulzzh.yuzu.mixins",
+    "package": "me.shiiyuko.manosaba.mixins",
     "required": true,
     "refmap": "mixins.manosaba.refmap.json",
     "target": "@env(DEFAULT)",

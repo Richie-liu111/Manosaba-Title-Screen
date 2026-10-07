@@ -1,4 +1,4 @@
-package com.img.function;
+package me.shiiyuko.manosaba.function;
 
 /**
  * 缓动动画函数接口：根据时间进度 (0..1) 和当前值计算下一帧的值。

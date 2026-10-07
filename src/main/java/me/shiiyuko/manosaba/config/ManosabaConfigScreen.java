@@ -1,4 +1,4 @@
-package com.paulzzh.yuzu.config;
+package me.shiiyuko.manosaba.config;
 
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;

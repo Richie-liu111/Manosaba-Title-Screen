@@ -64,9 +64,10 @@ validateDistributionUrl=false
 ### 三层渲染架构
 
 ```
-com.img.*              → 引擎核心（Layer, VirtualScreen, TitleScreenButton, AnimationFunction）
+me.shiiyuko.manosaba.gui.* / .function.*
+                       → 引擎核心（Layer, VirtualScreen, TitleScreenButton, AnimationFunction）
                          跨版本不修改
-com.paulzzh.yuzu.*     → 项目核心（渲染主类, Mixin, 配置, 声音注册）
+me.shiiyuko.manosaba.* → 项目核心（渲染主类, Mixin, 配置, 声音注册）
                          1.12.2 适配层
 assets/                 → 资源文件（纹理, 音效, JSON）
                          与 forge-1 共享
