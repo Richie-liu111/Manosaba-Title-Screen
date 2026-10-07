@@ -34,4 +34,6 @@ logs/
 
 # Local configuration
 local.properties
-*.localExitDialog.java.bak
+*.local
+*.bak
+docs/

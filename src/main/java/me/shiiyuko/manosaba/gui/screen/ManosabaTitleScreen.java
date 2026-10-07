@@ -42,7 +42,7 @@ import java.util.List;
  *   <li>背景图 ContentScale.Crop（2:1→16:9），1.1→1.0 呼吸动画；</li>
  *   <li>TitleOverlay 2560×1440 全屏画框 1:1 填充，延迟淡入；</li>
  *   <li>TitleLogo 位于原 anchoredPosition=(747,381)，原生尺寸；</li>
- *   <li>5 个按钮使用原游戏 anchoredPosition + 160px 左移（避免 Exit 被 scissor 裁剪）；</li>
+ *   <li>5 个按钮以中心 X 坐标表 cx[] 定位，附实测微调 normalOx[]（最大 11px）；</li>
  *   <li>版本号右下角；点击 Exit 直接退出游戏。</li>
  * </ul>
  * 动画由 {@link Layer#tick()} 和 {@link TitleScreenButton#tick()} 驱动，
@@ -451,7 +451,7 @@ public class ManosabaTitleScreen extends TitleScreen {
     /**
      * 入场模糊：把背景（含当前缩放裁切）画进低分辨率 RenderTarget（640×360），
      * 再以线性过滤上采样回屏幕 letterbox 区域，alpha = blurPower 覆盖在清晰版上。
-     * 低分辨率 + 线性插值放大 = 平滑高斯式模糊（同 Satin / 原版暂停菜单模糊）。
+     * 低分辨率 + 线性插值放大 = 近似柔化（双线性上采样，非真正的高斯模糊）。
      */
     private void renderBlurredBackground(GuiGraphics guiGraphics, float blurPower,
                                          int scissorX, int scissorY, int scissorW, int scissorH) {

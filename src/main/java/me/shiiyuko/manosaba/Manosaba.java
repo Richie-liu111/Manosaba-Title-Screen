@@ -39,9 +39,11 @@ public class Manosaba {
         ManosabaConfig.register();
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         ManosabaSounds.SOUND_EVENTS.register(modEventBus);
-        MinecraftForge.EVENT_BUS.register(this);
 
         if (FMLEnvironment.dist == Dist.CLIENT) {
+            // 事件总线只能在客户端注册：onPlayerLoggedIn 的参数类型是 client-only 的
+            // ClientPlayerNetworkEvent，专用服务器上注册会在事件扫描时 NoClassDefFoundError。
+            MinecraftForge.EVENT_BUS.register(this);
             MinecraftForge.registerConfigScreen(ManosabaConfigScreen::new);
             LOGGER.info("Manosaba title screen loaded (Forge 1.20.1).");
         }
