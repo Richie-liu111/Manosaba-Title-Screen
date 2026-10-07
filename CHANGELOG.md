@@ -1,5 +1,13 @@
 # Changelog
 
+## v1.0.5 — 2026-10-07（CI）
+
+### 新增 CI
+
+`.github/workflows/build.yml`：push / PR 时 `./gradlew build` 并上传 `build/libs/` 产物。
+JDK 21（Gradle 9.2.1 + NeoGradle 运行需求，同时满足 `java.toolchain.languageVersion = 21`）。
+此前本分支从未被自动编译验证过。
+
 ## v1.0.5 — 2026-07-31
 
 ### 还原原游戏四项功能（完整 v1.0.5，含 ExitDialog）
