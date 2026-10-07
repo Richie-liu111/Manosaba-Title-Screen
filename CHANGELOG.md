@@ -2,6 +2,20 @@
 
 ## v1.0.5 — 2026-10-07（包名对齐 + CI + 交互修复）
 
+### 修复：CI 的 JDK 版本错误（RetroFuturaGradle 需要 Java 25）
+
+workflow 最初给的是 JDK 17（按 Gradle 的最低要求推断），但 RFG 2.0.2 自身是用
+Java 25 编译的（class file version 69），在 JDK 17 上连插件都加载不了：
+
+```
+java.lang.UnsupportedClassVersionError: com/gtnewhorizons/retrofuturagradle/UserDevPlugin
+  has been compiled by a more recent version of the Java Runtime (class file version 69.0),
+  this version of the Java Runtime only recognizes class file versions up to 61.0
+```
+
+改为 JDK 25（与开发机一致），编译侧的 Java 8 toolchain 与 Azul JDK 16 仍由
+foojay resolver 自动下载。
+
 ### 修复：Gradle wrapper 指向本机文件，CI 无法构建
 
 `gradle/wrapper/gradle-wrapper.properties` 里的 `distributionUrl` 一直指向
