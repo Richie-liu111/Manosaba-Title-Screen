@@ -1,6 +1,14 @@
 # Changelog
 
-## v1.0.5 — 2026-10-07（CI）
+## v1.0.6 — 2026-10-11（CI + 版本号）
+
+### 版本号
+
+1.0.5 → 1.0.6（`gradle.properties`）。
+
+致谢无需改动：`mcmod.info` 的 `credits` 里早已署明
+「GTNH 1.7.10 port based on YuZuUI-GTNH by Paulzzh」。
+
 
 ### 新增 CI
 
