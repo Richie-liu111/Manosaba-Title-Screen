@@ -1,6 +1,13 @@
 # Changelog
 
-## v1.0.5 — 2026-10-07（包名对齐 + CI + 交互修复）
+## v1.0.6 — 2026-10-11（包名对齐 + CI + 交互修复）
+
+### 版本号
+
+1.0.5 → 1.0.6（`gradle.properties` 与 `Manosaba.VERSION`——后者是游戏内模组列表
+显示的版本号）。致谢无需改动：`mcmod.info` 的 `credits` 里早已署明
+「1.12.2 port based on YuZuUI-Vintage by RuiXuqi」。
+
 
 ### 修复：CI 的 JDK 版本错误（RetroFuturaGradle 需要 Java 25）
 
