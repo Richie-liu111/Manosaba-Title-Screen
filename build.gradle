@@ -48,8 +48,12 @@ processResources {
 	def version = project.version
 	inputs.property "version", version
 
-	filesMatching("fabric.mod.json") {
-		expand "version": version
+	// 不要用 expand：Groovy 的模板引擎在替换变量之余，还会把 JSON 字符串里的
+	// 反斜杠转义（例如描述中的换行转义）解成真实换行，产出非法 JSON——
+	// description 里会出现裸控制字符。Fabric Loader 用 Gson 宽松模式能容忍，
+	// 但 Modrinth 等严格解析器会拒绝。这里只做字面替换。
+	filesMatching("fabric.mod.json") { details ->
+		details.filter { line -> line.replace('${version}', version.toString()) }
 	}
 }
 
