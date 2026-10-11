@@ -1,6 +1,15 @@
 # Changelog
 
-## v1.0.5 — 2026-10-07（CI）
+## v1.0.6 — 2026-10-11（CI + 致谢）
+
+### 版本与致谢
+
+- 版本号 1.0.5 → 1.0.6
+- 模组描述补充致谢：
+  - **[YuZuUI-Forge](https://github.com/ming-sc/YuZuUI-Forge) by ming-sc** —— UI 渲染骨架来源
+  - **[SenrenBanka-UI](https://github.com/link-fgfgui/SenrenBanka-UI/tree/neoforge/1.21.1)
+    by link-fgfgui** —— 1.21.1 NeoForge 适配参考
+
 
 ### 新增 CI
 
