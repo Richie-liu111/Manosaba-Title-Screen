@@ -15,7 +15,7 @@
   - 无存档时 LoadGame 显示锁定态（原游戏 Locked 状态）
   - 右下角版本号
 - **退出确认对话框**：点击 Exit 弹出 2 级菜单（压暗黑幕 + 亮色条带 + 装饰条 + 消息黑字 + 取消/结束按钮，布局还原 ProvidableDialog.prefab），确认后主界面 UI 随黑幕淡出并退出游戏
-- **自定义背景音乐**：标题 BGM 由主界面自行管理（黑幕淡出时响起、子界面不中断、进世界停止、切语言重载后自动重播）；音效使用原游戏 Sfx_System_*_001 系统音效
+- **自定义背景音乐**：标题 BGM 由主界面自行管理（黑幕淡出时响起、子界面不中断、进世界停止、切语言重载后自动重播）；音效使用原游戏 Sfx_System_*_001
 
 ## 按钮功能映射
 
@@ -29,7 +29,6 @@
 
 ## 与原版 v1.0.5（Forge 1.20.1）的差异
 
-- **去掉配置功能**：固定 HIRO 背景，删除 ManosabaConfig / ManosabaConfigScreen
 - **跳过入场模糊**：删除 640×360 FBO 离屏模糊，背景保留 EaseOutQuad 缩放动画
 - **logo 只播一次**：高版本原版加载界面已原生显示开发者 logo，删除 `BootLogoScreen`，发行商/开发商 logo 仅在加载界面播放一次（详见 CHANGELOG）
 
@@ -47,7 +46,7 @@
 ./gradlew build
 ```
 
-构建产物位于 `build/libs/manosaba-1.0.5.jar`。
+构建产物位于 `build/libs/manosaba-1.0.6.jar`。
 
 ### 开发运行
 
