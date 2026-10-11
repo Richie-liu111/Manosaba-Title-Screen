@@ -3,7 +3,19 @@
 本 mod 为 Manosaba 标题屏替换 mod（灵感来自《魔法少女ノ魔女裁判》）的 **Fabric 1.21.11** 移植版。
 源码移植自 `1.21.10fabric`（v1.0.5），纯客户端 mod。
 
-## [1.0.5-fabric-1.21.11+config] - 2026-10-07
+## [1.0.6-fabric-1.21.11] - 2026-10-11
+
+### 版本与致谢
+
+- 版本号 1.0.5 → 1.0.6
+- **补上 `Long` 拆箱守卫**（`Layer.tick()` / `TitleScreenButton.tick()`）：
+  `duration` 是 `Long`，`duration == 0` 会拆箱，为 null 时 NPE。本分支从
+  1.21.10fabric 移植时漏掉了 2026-10-07 加的那处修复。当前调用点永远成对设置
+  delay/duration，所以触发不了，属防御性一致性修复。
+- 模组描述补充致谢：
+  - **[YuZuUI-Forge](https://github.com/ming-sc/YuZuUI-Forge) by ming-sc** —— UI 渲染骨架来源
+  - **[NeoYuZu-UI](https://github.com/yiyuyan/NeoYuZu-UI) by yiyuyan** —— 1.21.9+ 输入 API
+    与渲染流水线参考
 
 ### 配置界面与 Mod Menu 集成
 

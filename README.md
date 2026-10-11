@@ -64,7 +64,7 @@
 ./gradlew build
 ```
 
-构建产物位于 `build/libs/manosaba-1.0.5.jar`。
+构建产物位于 `build/libs/manosaba-1.0.6.jar`。
 
 ### 开发运行
 

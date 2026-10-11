@@ -3,7 +3,7 @@
 	"id": "manosaba",
 	"version": "${version}",
 	"name": "Manosaba Title Screen",
-	"description": "Manosaba title screen port (Fabric 1.21.11).\nOriginal Fabric mod by Shiiyuko.",
+	"description": "Manosaba title screen port (Fabric 1.21.11).\nUI engine based on YuZuUI-Forge by ming-sc (https://github.com/ming-sc/YuZuUI-Forge); 1.21.9+ input and render pipeline reference: NeoYuZu-UI by yiyuyan (https://github.com/yiyuyan/NeoYuZu-UI).\nOriginal Fabric mod by Shiiyuko.",
 	"authors": [
 		"Shiiyuko",
 		"Richie-liu111"

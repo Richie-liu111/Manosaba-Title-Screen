@@ -132,7 +132,9 @@ public class Layer implements Renderable, Tickable {
 
     @Override
     public void tick() {
-        if (delay == null || duration == 0) {
+        // duration == null 必须先判：duration 是 Long，`duration == 0` 会把它拆箱，
+        // 为 null 时直接 NPE。其余 5 支已有此守卫，本分支补上以保持一致。
+        if (delay == null || duration == null || duration == 0L) {
             return;
         }
 
