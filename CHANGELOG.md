@@ -2,6 +2,36 @@
 
 ## v1.0.6 — 2026-10-11（包名对齐 + CI + 交互修复）
 
+### 修复：ESC 退出二级菜单后重播入场动画 + BGM 叠加
+
+**症状**：点任意按钮（Exit 除外）进入二级菜单，按 ESC 返回标题界面后，背景的缩放入场动画
+**每次都会**重播，且**每重播一次就叠一层背景音乐**。
+
+**根因**（已在字节码层面验证）：
+
+子界面（如 `GuiOptions`）按 ESC 时，`GuiScreen.keyTyped` 会走 `mc.displayGuiScreen(null)`，
+而原版 `Minecraft.displayGuiScreen` 在无世界时会据此**新建一个 `GuiMainMenu`**：
+
+```java
+if (guiScreenIn == null && this.world == null) {
+    guiScreenIn = new GuiMainMenu();
+}
+```
+
+`EventHandler.onGuiOpen` 拦到它，判定「玩家进标题界面了」，于是 `new ManosabaTitleScreen()`。
+构造函数把 `animStart` 归零 → 动画重播；又 `currentBGM = null` 而**旧的 BGM 没人停**
+→ `updateScreen()` 里的 `startBGM()` 再播一层 → 音频叠加。
+
+`GuiWorldSelection` / `GuiCreateWorld` 的 ESC 是 `displayGuiScreen(this.parentScreen)`
+（回到原实例），所以不是所有按钮都中招。
+
+**修法**：
+
+- 标题屏实例改成会话内单例（`ManosabaTitleScreen.getInstance()`），`EventHandler` 与
+  `BootLogoScreen` 都走它；`ClientConnectedToServer` 时 `resetInstance()`，
+  保留「从世界返回时重播动画」的原行为。
+- 构造函数改为**先停掉仍在播放的上一首 BGM 再置 null**——原来只置 null，是叠加的直接原因。
+
 ### 版本号
 
 1.0.5 → 1.0.6（`gradle.properties` 与 `Manosaba.VERSION`——后者是游戏内模组列表

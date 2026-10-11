@@ -52,7 +52,9 @@ public class BootLogoScreen extends GuiScreen {
     @Override
     public void updateScreen() {
         if (System.currentTimeMillis() - startTime >= TOTAL_MS) {
-            this.mc.displayGuiScreen(new ManosabaTitleScreen());
+            // 走缓存实例，不要 new：否则后面从子界面 ESC 回来时 EventHandler 又新建
+            // 一个，导致入场动画重播、BGM 叠加（详见 ManosabaTitleScreen#getInstance）
+            this.mc.displayGuiScreen(ManosabaTitleScreen.getInstance());
         }
     }
 

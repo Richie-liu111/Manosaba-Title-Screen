@@ -29,7 +29,13 @@ public class EventHandler {
                 Manosaba.inGame = false;
                 return;
             }
-            event.setGui(new ManosabaTitleScreen());
+            // 复用缓存实例，不要每次都 new。
+            // 子界面（如 GuiOptions）按 ESC 时 GuiScreen.keyTyped 会走
+            // mc.displayGuiScreen(null)，而原版在无世界时会据此新建一个 GuiMainMenu
+            // （见 Minecraft.displayGuiScreen）。这里若也跟着 new，构造函数会把
+            // animStart 归零、currentBGM 置 null（旧 BGM 仍在播），表现为入场动画
+            // 重播 + 背景音乐叠加。复用同一实例即可；从世界返回时才丢弃（见下方）。
+            event.setGui(ManosabaTitleScreen.getInstance());
             Manosaba.inGame = false;
             Manosaba.LOGGER.info("inGame = false (title screen shown)");
         }
@@ -39,6 +45,8 @@ public class EventHandler {
     public static void onClientConnectedToServer(FMLNetworkEvent.ClientConnectedToServerEvent event) {
         // 玩家进入世界/服务器 → 标记 inGame，允许 MusicTicker 运行
         Manosaba.inGame = true;
+        // 丢弃缓存的标题屏实例：下次回到标题界面时重播入场动画（原行为）
+        ManosabaTitleScreen.resetInstance();
         Manosaba.LOGGER.info("inGame = true (joined server/world)");
     }
 }

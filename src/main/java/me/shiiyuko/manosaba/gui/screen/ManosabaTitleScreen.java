@@ -73,8 +73,37 @@ public class ManosabaTitleScreen extends GuiMainMenu {
     private static boolean firstInit = true;
     private static int prevW = -1, prevH = -1;
 
+    /** 会话内复用的标题屏实例，见 {@link #getInstance()}。 */
+    private static ManosabaTitleScreen instance;
+
+    /**
+     * 取会话内缓存的标题屏实例（没有则新建）。
+     *
+     * <p>子界面按 ESC 时 {@code GuiScreen.keyTyped} 会调 {@code mc.displayGuiScreen(null)}，
+     * 原版在无世界时会据此新建一个 {@code GuiMainMenu}，{@code EventHandler} 再把它换成
+     * 标题屏。若那时也 new 一个实例，构造函数会把 {@code animStart} 归零、
+     * {@code currentBGM} 置 null（而旧 BGM 仍在播），表现为入场动画重播 + 背景音乐叠加。
+     * 复用同一实例即可避免。从世界返回时才用 {@link #resetInstance()} 丢弃。
+     */
+    public static ManosabaTitleScreen getInstance() {
+        if (instance == null) {
+            instance = new ManosabaTitleScreen();
+        }
+        return instance;
+    }
+
+    /** 丢弃缓存实例，让下次进入标题屏重播入场动画（从世界返回时调用）。 */
+    public static void resetInstance() {
+        instance = null;
+    }
+
     public ManosabaTitleScreen() {
         animStart = System.currentTimeMillis();
+        // 先停掉可能仍在播放的上一首 BGM，再置 null。
+        // 只置 null 而不停的话，updateScreen() 里的 startBGM() 会再叠一层上去。
+        if (currentBGM != null && Minecraft.getMinecraft().getSoundHandler() != null) {
+            Minecraft.getMinecraft().getSoundHandler().stopSound(currentBGM);
+        }
         currentBGM = null; // 新实例 → BGM 从头播（游戏退出回来时）
         initLayers();
     }
