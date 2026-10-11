@@ -1,6 +1,14 @@
 # Changelog
 
-## v1.0.5 — 2026-10-07（工程化：CI + 跨分支同步工具）
+## v1.0.6 — 2026-10-11（工程化：CI + 跨分支同步工具 + 致谢）
+
+### 版本与致谢
+
+- 版本号 1.0.5 → 1.0.6
+- 模组描述补充 UI 引擎来源致谢：**[YuZuUI-Forge](https://github.com/ming-sc/YuZuUI-Forge)
+  by ming-sc**（1.20.1 原版，本分支的 UI 渲染骨架来源）。
+  此前只在 README / NOTICE 里有，模组列表里看不到。
+
 
 ### 新增 CI
 
