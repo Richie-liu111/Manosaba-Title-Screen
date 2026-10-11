@@ -8,7 +8,6 @@ import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.multiplayer.WorldClient;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -28,8 +27,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  */
 @Mixin(value = Minecraft.class)
 public class MinecraftMixin {
-    @Unique
-    private static ManosabaTitleScreen manosaba$instance = null;
 
     @Inject(method = "displayGuiScreen", at = @At(value = "RETURN"))
     public void manosaba$replaceMainMenu(GuiScreen guiScreenIn, CallbackInfo ci) {
@@ -42,10 +39,11 @@ public class MinecraftMixin {
                 Minecraft.getMinecraft().displayGuiScreen(new BootLogoScreen());
                 return;
             }
-            if (manosaba$instance == null) {
-                manosaba$instance = new ManosabaTitleScreen();
-            }
-            Minecraft.getMinecraft().displayGuiScreen(manosaba$instance);
+            // 走 ManosabaTitleScreen 的缓存实例：子界面 ESC 会走
+            // displayGuiScreen(null) → 原版新建 GuiMainMenu → 这里再换回来，
+            // 若每次都 new，新实例的 initialized=false 会让 initGui() 重跑，
+            // 表现为入场动画重播（详见 ManosabaTitleScreen#getInstance）
+            Minecraft.getMinecraft().displayGuiScreen(ManosabaTitleScreen.getInstance());
         }
     }
 

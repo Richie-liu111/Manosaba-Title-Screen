@@ -69,7 +69,9 @@ public class BootLogoScreen extends GuiScreen {
     private void skip() {
         if (!finished) {
             finished = true;
-            this.mc.displayGuiScreen(new ManosabaTitleScreen());
+            // 走缓存实例，不要 new：否则子界面 ESC 回来时 MinecraftMixin 又新建一个，
+            // 导致入场动画重播（详见 ManosabaTitleScreen#getInstance）
+            this.mc.displayGuiScreen(ManosabaTitleScreen.getInstance());
         }
     }
 

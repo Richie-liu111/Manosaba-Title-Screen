@@ -1,6 +1,28 @@
 # Changelog
 
-## v1.0.6 — 2026-10-11（CI + 版本号）
+## v1.0.6 — 2026-10-11（CI + 版本号 + 交互修复）
+
+### 修复：ESC 退出二级菜单后重播入场动画
+
+**症状**：点任意按钮（Exit 除外）进入二级菜单，按 ESC 返回标题界面后，背景的缩放入场动画
+会重新播一遍。**仅第一次**出现，之后正常。
+
+**根因**（已在字节码层面验证）：
+
+子界面（如 `GuiOptions`）按 ESC 时，`GuiScreen.keyTyped` 会走 `mc.displayGuiScreen(null)`，
+而原版 `Minecraft.displayGuiScreen` 在无世界时会据此**新建一个 `GuiMainMenu`**。
+`MinecraftMixin` 拦到它、换回标题屏——但那时 mixin 自己的 `manosaba$instance` 缓存还是
+null（首屏是 `BootLogoScreen` 直接 `new ManosabaTitleScreen()` 显示的，没走缓存），
+于是又新建了一个实例。新实例的 `initialized` 为 false，`initGui()` 会重跑并把 `initTime`
+归零 → 入场动画重播。之后缓存有值，复用同一实例，所以不再重播。
+
+**修法**：把实例缓存从 mixin 移到 `ManosabaTitleScreen` 的静态单例
+（`getInstance()`），`MinecraftMixin`、`BootLogoScreen` 统一走它。
+「从世界返回时重播」仍由原有的 `inGamed` 标志负责，未改动。
+
+**未修**：同一路径下 1.7.10 还会把鼠标光标移到屏幕中心
+（`MouseHelper.ungrabMouseCursor()` 里的 `Mouse.setCursorPosition(w/2, h/2)`，
+现代版本已移除该位移）。非阻断，决定不修。
 
 ### 版本号
 

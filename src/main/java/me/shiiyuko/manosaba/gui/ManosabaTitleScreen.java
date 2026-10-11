@@ -73,6 +73,28 @@ public class ManosabaTitleScreen extends GuiScreen {
     private int blurTexture = -1;
     private boolean blurAvailable = false;
 
+    /** 会话内复用的标题屏实例，见 {@link #getInstance()}。 */
+    private static ManosabaTitleScreen instance;
+
+    /**
+     * 取会话内缓存的标题屏实例（没有则新建）。
+     *
+     * <p>子界面（如 GuiOptions）按 ESC 时 {@code GuiScreen.keyTyped} 会调
+     * {@code displayGuiScreen(null)}，原版在无世界时会据此新建一个 {@code GuiMainMenu}，
+     * {@code MinecraftMixin} 再把它换成标题屏。若那时也 new 一个实例，新实例的
+     * {@code initialized} 是 false，{@code initGui()} 会重跑一遍并把 {@code initTime}
+     * 归零——表现为入场动画重播。复用同一实例即可避免（{@code initialized} 仍为 true，
+     * {@code initGui()} 直接返回）。
+     *
+     * <p>「从世界返回时重播」另由 {@code inGamed} 标志负责，不依赖新建实例。
+     */
+    public static ManosabaTitleScreen getInstance() {
+        if (instance == null) {
+            instance = new ManosabaTitleScreen();
+        }
+        return instance;
+    }
+
     public ManosabaTitleScreen() {
         this.initTime = System.currentTimeMillis();
     }
